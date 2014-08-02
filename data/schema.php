@@ -1,0 +1,37 @@
+<?php
+
+return [
+  [
+    'name'=>'users',
+    'fields'=>[
+      [
+        'name'=>'name',
+        'label'=>'Name',
+        'type'=>'text',
+        'required'=>true,
+      ]
+    ]
+  ],
+  [
+    'name'=>'posts',
+    'fields'=>[
+      [
+        'name'=>'title',
+        'label'=>'Title',
+        'type'=>'text',
+        'required'=>true,
+      ],
+      [
+        'name'=>'content',
+        'label'=>'Content',
+        'type'=>'wysiwyg',
+      ],
+      [
+        'name'=>'users',
+        'label'=>'Users',
+        'collection'=>'users',
+        'many'=>true,
+      ]
+    ]
+  ]
+];

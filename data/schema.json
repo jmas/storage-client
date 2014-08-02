@@ -1,0 +1,47 @@
+[
+    {
+        "name": "users",
+        "fields": [
+            {
+                "name": "name",
+                "label": "Name",
+                "type": "text",
+                "required": true,
+                "displayed": true
+            },
+            {
+                "name": "second_name",
+                "sort": 1,
+                "type": "text",
+                "label": "Second name",
+                "defaultValue": "",
+                "required": false,
+                "displayed": false
+            }
+        ]
+    },
+    {
+        "name": "posts",
+        "fields": [
+            {
+                "name": "content",
+                "label": "Content",
+                "type": "wysiwyg"
+            },
+            {
+                "name": "users",
+                "label": "Users",
+                "type": "collection",
+                "collection": "users",
+                "many": true
+            },
+            {
+                "name": "title",
+                "label": "Title",
+                "type": "text",
+                "required": true,
+                "displayed": true
+            }
+        ]
+    }
+]

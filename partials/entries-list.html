@@ -1,0 +1,24 @@
+<div class="entry-list-options">
+  <a href="#collection/{{collectionId}}/entry/create" class="btn trusty">Create</a>
+  <a class="btn select-all-btn" ng-click="selectAll()" ng-class="{active: !isAllSelected()}">Select All</a>
+  <a class="btn deselect-all-btn" ng-click="deselectAll()" ng-class="{active: isSelected()}">Deselect</a>
+  <a href="#" class="btn danger remove-btn" ng-class="{active: isSelected()}">Remove Selected</a>
+</div>
+
+<div class="entry-list">
+  <div class="item" ng-repeat="item in collection.entries" ng-if="item.id" ng-class="{active: isSelectedEntry(item.id)}" ng-click="selectEntry(item.id)">
+    <div class="field-list">
+      <div class="field-item" ng-repeat="field in collection.fields" ng-if="field.displayed">
+        <span class="field-label" ng-class="{required: field.required}">{{field.label || field.name}}</span>
+        <span class="field-value">{{item[field.name]}}</span>
+      </div>
+    </div>
+    <div class="modified" ng-if="item.modified">
+      {{toDate(item.modified)}}
+    </div>
+    <div class="options">
+      <a href="#collection/{{collectionId}}/entry/{{$index}}/edit"><img src="images/edit.png" /></a>
+      <a href="#"><img src="images/remove.png" /></a>
+    </div>
+  </div>
+</div>

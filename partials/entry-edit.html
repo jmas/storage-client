@@ -1,0 +1,13 @@
+<div id="entry-edit" class="entry-edit">
+  <div class="entry-field-list">
+    <div class="item item-{{item.type}}" ng-repeat="item in collection.fields">
+      <label ng-class="{required: item.required}">{{item.label || item.name}}</label>
+      <div class="field"><field name="item.name" entry="entry" options="item" value="entry[item.name]" /></div>
+    </div>
+  </div>
+
+  <div class="entry-edit-buttons">
+    <a class="btn primary" ng-click="save()">Save</a>
+    <a class="btn" ng-click="saveAndClose()">Save and Close</a>
+  </div>
+</div>

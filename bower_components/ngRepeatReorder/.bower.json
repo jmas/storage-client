@@ -1,0 +1,39 @@
+{
+  "name": "ngRepeatReorder",
+  "version": "0.1.0",
+  "main": "./dist/ngRepeatReorder.js",
+  "keywords": [
+    "angular"
+  ],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test*",
+    "demo*",
+    "Gruntfile.coffee",
+    "package.json",
+    "karma.conf.coffee"
+  ],
+  "dependencies": {
+    "angular": "~1.2.13",
+    "angular-hammer": "~1.x",
+    "hammerjs": "1.x"
+  },
+  "devDependencies": {
+    "bootstrap": "3.x",
+    "font-awesome": "4.x"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/SimeonC/ngRepeatReorder",
+  "_release": "0.1.0",
+  "_resolution": {
+    "type": "version",
+    "tag": "v0.1.0",
+    "commit": "46011c8aad45255c318535bcfd17c56b5a90f93d"
+  },
+  "_source": "git://github.com/SimeonC/ngRepeatReorder.git",
+  "_target": "~0.1.0",
+  "_originalSource": "ngRepeatReorder",
+  "_direct": true
+}

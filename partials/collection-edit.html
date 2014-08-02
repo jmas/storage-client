@@ -1,0 +1,87 @@
+<div id="collection-setup">
+  <div class="collection-name">
+    <input type="text" placeholder="Collection name" ng-model="collection.name" />
+  </div>
+
+  <div id="sidebar">
+    <div id="fields-sorter" class="field-sorter-list">
+      <div class="item" ng-repeat-reorder="item in collection.fields">
+        <span ng-repeat-reorder-handle class="move"></span>
+        <span class="name">{{item.name}}</span>
+        <span class="select"><input type="checkbox" ng-model="item.displayed" /></span>
+      </div>
+    </div>
+
+    <div id="fields-sortby">
+      <select ng-model="collection.sort">
+        <option>- Sort By -</option>
+        <option value="{{field.name}}" ng-repeat="field in collection.fields" ng-selected="collection.sort == field.name">{{field.name}}</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="has-sidebar">
+
+    <div id="collection-field-list" class="collection-field-list" ng-repeat="item in collection.fields">
+      <div class="item">
+        <div class="name">
+          <input type="text" ng-model="item.name" ng-change="setCollectionChange()" placeholder="Field name" />
+        </div>
+        <div class="options">
+          <a ng-click="toggleField($index)"><img src="images/setup.png" /></a>
+          <a ng-click="removeField($index)"><img src="images/remove.png" /></a>
+        </div>
+        <div class="field-list" ng-class="{active: activeFieldIndex == $index}">
+          <div class="field-item">
+            <div class="field-setup-options">
+              <div class="field-setup-option">
+                <select ng-model="item.type">
+                  <option value="text">Text</option>
+                  <option value="password">Password</option>
+                  <option value="boolean">Boolean</option>
+                  <option value="select">Select</option>
+                  <option value="wysiwyg">Wysiwyg</option>
+                  <option value="multiline">Multiline</option>
+                  <option value="datetime">Date Time</option>
+                  <option value="number">Number</option>
+                  <option value="float">Float Number</option>
+                  <option value="media">Media</option>
+                  <option value="collection">Collection</option>
+                </select>
+              </div>
+              <div class="field-setup-option">
+                <input type="text" placeholder="Label" ng-model="item.label" />
+              </div>
+              <div class="field-setup-option">
+                <input type="text" placeholder="Default value" ng-model="item.defaultValue" />
+              </div>
+            </div>
+            <div class="field-options-title">
+              Extra Options
+            </div>
+            <div class="field-options">
+              <div class="field-option">
+                <label>Required</label>
+                <span class="field"><input type="checkbox" ng-model="item.required" /></span>
+              </div>
+              <div class="field-option">
+                <label>Options</label>
+                <span class="field"><input type="text" /></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="collection-setup-options">
+      <a ng-click="addField(collectionId)" class="btn trusty">Add Field</a>
+    </div>
+
+    <div class="collection-setup-buttons">
+      <a class="btn primary" ng-click="save()">Save</a>
+      <a class="btn" ng-click="saveAndClose()">Save and Close</a>
+    </div>
+
+  </div>
+</div>
