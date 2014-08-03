@@ -78,8 +78,17 @@ class Storage
 
     $batchSql = [];
 
-    if ($schema['name'] != $currentSchema['name']) {
-      $batchSql[] = "ALTER TABLE {$currentSchema['name']} RENAME {$schema['name']}";
+    if ($currentSchema !== null) {
+      if ($schema['name'] != $currentSchema['name']) {
+        $batchSql[] = "ALTER TABLE {$currentSchema['name']} RENAME {$schema['name']}";
+      }
+    } else {
+      $batchSql[] = "CREATE TABLE {$name} (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY)";
+
+      $currentSchema = [
+        'name'=>$name,
+        'fields'=>[],
+      ];
     }
 
     function getSqlType($type) {
@@ -157,13 +166,22 @@ class Storage
       unset($schema['fields'][$i]['_name']);
     }
 
+    $isFound = false;
+
     foreach ($this->schema as $i => $collection) {
       if ($collection['name'] == $schema['_name']) {
         unset($schema['_name']);
 
         $this->schema[$i] = $schema;
+
+        $isFound = true;
         break;
       }
+    }
+
+    if (! $isFound) {
+      unset($schema['_name']);
+      $this->schema[] = $schema;
     }
 
     foreach ($batchSql as $sql) {
@@ -595,7 +613,7 @@ class Storage
     }
 
     if ($returnRecord) {
-      $id = isset($data['id']) ? $data['id']: $sth->lastInsertId();
+      $id = isset($data['id']) ? $data['id']: $this->connection->lastInsertId();
 
       return $this->setCollection($this->collectionName)->filter(['id'=>$id])->one();
     }

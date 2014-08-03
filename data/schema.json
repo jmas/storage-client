@@ -16,18 +16,15 @@
                 "label": "Second name",
                 "defaultValue": "",
                 "required": false,
-                "displayed": false
+                "displayed": true
             }
-        ]
+        ],
+        "sort": "second_name",
+        "sortType": "-1"
     },
     {
         "name": "posts",
         "fields": [
-            {
-                "name": "content",
-                "label": "Content",
-                "type": "wysiwyg"
-            },
             {
                 "name": "users",
                 "label": "Users",
@@ -36,12 +33,93 @@
                 "many": true
             },
             {
+                "name": "content",
+                "label": "Content",
+                "type": "wysiwyg"
+            },
+            {
                 "name": "title",
                 "label": "Title",
                 "type": "text",
                 "required": true,
                 "displayed": true
             }
+        ],
+        "sort": null
+    },
+    {
+        "name": "test4",
+        "fields": [
+            {
+                "name": "test_column",
+                "sort": 1,
+                "type": "text",
+                "label": "",
+                "defaultValue": "",
+                "required": false,
+                "displayed": true
+            }
         ]
+    },
+    {
+        "name": "test",
+        "fields": [
+            {
+                "name": "test",
+                "sort": 1,
+                "type": "text",
+                "label": "",
+                "defaultValue": "",
+                "required": false,
+                "displayed": true
+            }
+        ],
+        "sort": "test"
+    },
+    {
+        "name": "test124",
+        "fields": [
+            {
+                "name": "test123",
+                "sort": 1,
+                "type": "text",
+                "label": "",
+                "defaultValue": "",
+                "required": false,
+                "displayed": true
+            }
+        ],
+        "sort": null
+    },
+    {
+        "name": "new_collection",
+        "fields": [
+            {
+                "name": "test",
+                "sort": 1,
+                "type": "text",
+                "label": "",
+                "defaultValue": "",
+                "required": false,
+                "displayed": true
+            }
+        ],
+        "sort": "test"
+    },
+    {
+        "name": "number_col",
+        "fields": [
+            {
+                "name": "number_col",
+                "sort": 1,
+                "type": "number",
+                "label": "Number",
+                "defaultValue": "",
+                "required": true,
+                "displayed": true
+            }
+        ],
+        "sort": "number_col",
+        "sortType": "1"
     }
 ]

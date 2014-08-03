@@ -10,6 +10,24 @@ body {
   color: #2E2E2E;
 }
 
+[ng-repeat-reorder].dragging{
+  z-index: 11;
+  position: absolute;
+}
+
+.ng-repeat-reorder-parent,
+[ng-repeat-reorder] {
+  z-index: 10;
+  position: relative;
+}
+
+.active-drag-below {
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 a {
   color: #2E9AFE;
   text-decoration: none;
@@ -49,7 +67,7 @@ a:hover {
 }
 
 .btn.danger {
-  background-color: red;
+  background-color: #FE642E;
 }
 
 select {
@@ -128,6 +146,7 @@ textarea:focus {
 }
 
 #fields-sorter {
+  position: relative;
   margin-bottom: 15px;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -137,8 +156,13 @@ textarea:focus {
   user-select: none;
 }
 
+#fields-sortby {
+  margin-bottom: 10px;
+}
+
 #fields-sortby select {
   width: 100%;
+  margin-bottom: 5px;
 }
 
 #entries-filter input[type="text"] {
@@ -463,8 +487,12 @@ textarea:focus {
   font-size: .9em;
 }
 
-.field-sorter-list .item {
+.field-sorter-list {
   position: relative;
+}
+
+.field-sorter-list .item {
+  width: 170px;
   padding: 5px;
   background-color: #eee;
   border-radius: 3px;
@@ -607,5 +635,5 @@ textarea:focus {
 }
 
 #flash-messages li.success {
-  background-color: #5FB404;
+  background-color: #86B404;
 }

@@ -70,6 +70,14 @@ $app->delete('/collection/:name', function() use ($app) {
 $app->get('/collection/:name/entries', function($name) use ($app) {
   $collection = $app->storage->{$name};
 
+  $schema = $collection->getCollectionSchema($name);
+
+  if (isset($schema['sort'])) {
+    $sortType = isset($schema['sortType']) ? $schema['sortType']: -1;
+
+    $collection->sort([ $schema['sort'] => $sortType ]);
+  }
+
   $entries = $collection->all();
 
   $app->response->write(json_encode($entries));
@@ -83,6 +91,10 @@ $app->post('/collection/:name/entry', function($name) use ($app) {
   $collection = $app->storage->{$name};
 
   $data = json_decode($app->request->getBody(), true);
+
+  if (! $data) {
+    $data = [];
+  }
 
   $result = $collection->save($data, true);
 

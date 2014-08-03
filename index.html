@@ -3,7 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <title>app</title>
-    <link rel="stylesheet" type="text/css" href="css/app.css" />
+    <base href="/orm/" />
+    <link rel="stylesheet" type="text/css" href="/orm/css/app.css" />
     <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css" />
   </head>
   <body>
@@ -11,7 +12,7 @@
     <div id="app">
       <div id="breadcrumbs" ng-controller="BreadcrumbsCtrl">
         <span ng-repeat="item in app.getBreadcrumbs()">
-          <a class="item" href="#{{item.path}}" ng-if="item.path">{{item.name}}</a>
+          <a class="item" href="{{item.path}}" ng-if="item.path">{{item.name}}</a>
           <span class="item" ng-if="!item.path">{{item}}</span>
         </span>
       </div>

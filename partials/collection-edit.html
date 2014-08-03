@@ -5,17 +5,22 @@
 
   <div id="sidebar">
     <div id="fields-sorter" class="field-sorter-list">
-      <div class="item" ng-repeat-reorder="item in collection.fields">
-        <span ng-repeat-reorder-handle class="move"></span>
+      <div class="item" ng-repeat-reorder="item in collection.fields" ng-repeat-reorder-handle="i">
+        <i class="move test"></i>
         <span class="name">{{item.name}}</span>
         <span class="select"><input type="checkbox" ng-model="item.displayed" /></span>
       </div>
     </div>
 
     <div id="fields-sortby">
-      <select ng-model="collection.sort">
-        <option>- Sort By -</option>
+      <select ng-model="collection.sort" ng-init="collection.sort=(collection.sort ? collection.sort: null)">
+        <option value="null">- Sort By -</option>
         <option value="{{field.name}}" ng-repeat="field in collection.fields" ng-selected="collection.sort == field.name">{{field.name}}</option>
+      </select>
+
+      <select ng-model="collection.sortType" ng-init="collection.sortType=(collection.sortType ? collection.sortType: '-1')">
+        <option value="1">ascending</option>
+        <option value="-1">descending</option>
       </select>
     </div>
   </div>

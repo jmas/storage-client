@@ -1,5 +1,7 @@
 (function(a) {
 
+var baseUrl = 'api.php';
+
 var app = a.module('app', [
   'ngRoute',
   'textAngular',
@@ -7,13 +9,15 @@ var app = a.module('app', [
   'ngRepeatReorder'
 ]);
 
-app.config(function($routeProvider) {
+app.config(function($routeProvider, $locationProvider) {
+  $locationProvider.html5Mode(true);
+
   $routeProvider.
     when('/collections', {
       templateUrl: 'partials/collections-list.html',
       controller: 'CollectionsListCtrl'
     }).
-    when('/collection/:id/edit', {
+    when('/collection/:collectionName/edit', {
       templateUrl: 'partials/collection-edit.html',
       controller: 'CollectionEditCtrl'
     }).
@@ -21,15 +25,15 @@ app.config(function($routeProvider) {
       templateUrl: 'partials/collection-edit.html',
       controller: 'CollectionEditCtrl'
     }).
-    when('/collection/:id/entries', {
+    when('/collection/:collectionName/entries', {
       templateUrl: 'partials/entries-list.html',
       controller: 'EntriesListCtrl'
     }).
-    when('/collection/:collectionId/entry/:entryId/edit', {
+    when('/collection/:collectionName/entry/:entryId/edit', {
       templateUrl: 'partials/entry-edit.html',
       controller: 'EntryEditCtrl'
     }).
-    when('/collection/:collectionId/entry/create', {
+    when('/collection/:collectionName/entry/create', {
       templateUrl: 'partials/entry-edit.html',
       controller: 'EntryEditCtrl'
     }).
@@ -61,10 +65,12 @@ app.factory("AppService", function() {
   };
 
   return {
-    setBreadcrumbs: function(breadcrumbs) {
+    setBreadcrumbs: function(breadcrumbs)
+    {
       app.breadcrumbs = breadcrumbs;
     },
-    getBreadcrumbs: function() {
+    getBreadcrumbs: function()
+    {
       return app.breadcrumbs;
     }
   };
@@ -74,114 +80,31 @@ app.factory("CollectionService", function($http) {
   var data = {
     collections: []
   };
-  // var collections = [
-  //   {
-  //     id: 1,
-  //     name: 'First Collection',
-  //     sort: null,
-  //     fields: [
-  //       {
-  //         name: 'first',
-  //         sort: 1,
-  //         type: 'text',
-  //         label: 'Text example',
-  //         defaultValue: 'first field value',
-  //         required: true,
-  //         displayed: true
-  //       },
-  //       {
-  //         name: 'second',
-  //         sort: 1,
-  //         type: 'select',
-  //         label: 'Select example',
-  //         defaultValue: 'second field value',
-  //         required: true,
-  //         options: ['item 1', 'item 2', 'item 3']
-  //       },
-  //       {
-  //         name: 'three',
-  //         sort: 1,
-  //         type: 'boolean',
-  //         label: 'Boolean example',
-  //         defaultValue: 'default value',
-  //         required: true
-  //       },
-  //       {
-  //         name: 'four',
-  //         sort: 1,
-  //         type: 'wysiwyg',
-  //         label: 'Wysiwyg example',
-  //         defaultValue: 'default value'
-  //       }
-  //     ],
-  //     entries: [
-  //       {
-  //         id: 1,
-  //         first: 'Hello 1',
-  //         second: 'item 1',
-  //         three: true,
-  //         modified: 1406226504
-  //       },
-  //       {
-  //         id: 2,
-  //         first: 'Hello 2',
-  //         second: 'World 2',
-  //         modified: 1406226504
-  //       },
-  //       {
-  //         id: 3,
-  //         first: 'Hello 3',
-  //         second: 'World 3',
-  //         modified: 1406226504
-  //       }
-  //     ]
-  //   },
-  //   {
-  //     id: 2,
-  //     name: 'Second Collection',
-  //     sort: null,
-  //     fields: [
-  //       {
-  //         name: 'first',
-  //         sort: 1,
-  //         type: 'text',
-  //         label: 'First',
-  //         defaultValue: 'first field value',
-  //         required: true
-  //       },
-  //       {
-  //         name: 'second',
-  //         sort: 1,
-  //         type: 'text',
-  //         label: 'Second',
-  //         defaultValue: 'second field value',
-  //         required: true
-  //       }
-  //     ]
-  //   }
-  // ];
 
   return {
-    load: function() {
+    load: function()
+    {
       var self = this;
 
-      return $http({method: 'GET', url: '/orm/collections'}).success(function(result) {
+      return $http({method: 'GET', url: baseUrl + '/collections'}).success(function(result) {
         self.setCollections(result);
       });
     },
-    loadEntries: function(collectionIndex) {
-      var collection = this.getByIndex(collectionIndex);
+    loadEntries: function(collectionName)
+    {
+      var collection = this.getByName(collectionName);
       var self = this;
 
       if (typeof collection.entries != 'undefined') {
         collection.entries.splice(0, collection.entries.length);
       }
 
-      return $http({method: 'GET', url: '/orm/collection/' + collection.name + '/entries'}).success(function(result) {
-        self.setEntries(collectionIndex, result);
+      return $http({method: 'GET', url: baseUrl + '/collection/' + collection.name + '/entries'}).success(function(result) {
+        self.setEntries(collectionName, result);
       });
     },
-    setCollections: function(items) {
+    setCollections: function(items)
+    {
       for (var i=0,len=items.length; i<len; i++) {
         items[i]._name = items[i].name;
 
@@ -195,8 +118,9 @@ app.factory("CollectionService", function($http) {
         // data.collections.push(items[i]);  
       }
     },
-    setEntries: function(collectionIndex, items) {
-      var collection = this.getByIndex(collectionIndex);
+    setEntries: function(collectionName, items)
+    {
+      var collection = this.getByName(collectionName);
 
       if (typeof collection.entries == 'undefined') {
         collection.entries = [];
@@ -206,10 +130,12 @@ app.factory("CollectionService", function($http) {
         collection.entries.push(items[i]);
       }
     },
-    all: function() {
+    all: function()
+    {
       return data.collections;
     },
-    getById: function(id) {
+    getById: function(id)
+    {
       for (var i=0,len=data.collections.length; i<len; i++) {
         if (data.collections[i].id == id) {
           return data.collections[i];
@@ -218,16 +144,43 @@ app.factory("CollectionService", function($http) {
 
       return null;
     },
-    getByIndex: function(index) {
+    getByName: function(name)
+    {
+      for (var i=0,len=data.collections.length; i<len; i++) {
+        if (data.collections[i].name == name) {
+          return data.collections[i];
+        }
+      }
+
+      return null;
+    },
+    getIndexByName: function(name)
+    {
+      for (var i=0,len=data.collections.length; i<len; i++) {
+        if (data.collections[i].name == name) {
+          return i;
+        }
+      }
+
+      return null;
+    },
+    getByIndex: function(index)
+    {
       return data.collections[index] || null;
     },
-    set: function(index, data) {
-      data.collections[index] = data;
+    set: function(collectionName, collectionData)
+    {
+      var collection = this.getByName(collectionName);
+      
+      for (var k in collectionData) {
+        collection[k] = collectionData[k];
+      }
     },
-    getEntryById: function(collectionId, entryId) {
-      var collection = this.getByIndex(collectionId);
+    getEntryById: function(collectionName, entryId)
+    {
+      var collection = this.getByName(collectionName);
 
-      if (! collection.entries) {
+      if (! collection || typeof collection.entries == 'undefined') {
         return null;
       }
 
@@ -239,8 +192,9 @@ app.factory("CollectionService", function($http) {
 
       return null;
     },
-    getEntryByIndex: function(collectionId, entryId) {
-      var collection = this.getByIndex(collectionId);
+    getEntryByIndex: function(collectionName, entryId)
+    {
+      var collection = this.getByName(collectionName);
 
       if (! collection.entries) {
         return null;
@@ -248,8 +202,9 @@ app.factory("CollectionService", function($http) {
 
       return collection.entries[entryId] || null;
     },
-    addField: function(collectionId, data) {
-      var collection = this.getByIndex(collectionId);
+    addField: function(collectionName, data)
+    {
+      var collection = this.getByName(collectionName);
 
       // if (typeof collection.fields == 'undefined' || collection.fields === null) {
       //   collection.fields = [];
@@ -261,12 +216,14 @@ app.factory("CollectionService", function($http) {
 
       // collection.fields[index] = (typeof data == 'object' ? data: {});
     },
-    removeField: function(collectionId, index) {
-      var collection = this.getByIndex(collectionId);
+    removeField: function(collectionName, index)
+    {
+      var collection = this.getByName(collectionName);
 
       collection.fields.splice(index, 1);
     },
-    removeCollection: function(collectionId) {
+    removeCollection: function(collectionName)
+    {
       // for (var i=0,len=collections.length; i<len; i++) {
       //   if (collections[i].id == collectionId) {
       //     collections.splice(i, 1);
@@ -276,17 +233,23 @@ app.factory("CollectionService", function($http) {
 
       // data.collections.splice(collectionId, 1);
     },
-    add: function(item) {
+    add: function(item)
+    {
       var length = data.collections.push(item);
       // return collections[length - 1];
       return length - 1;
     },
-    addEntry: function(collectionId) {
-      var entry = {};
+    addEntry: function(collectionName, entry)
+    {
+      var entry = entry || { id: null };
 
-      var collection = this.getByIndex(collectionId);
+      var collection = this.getByName(collectionName);
 
-      if (! collection.entries) {
+      if (! collection) {
+        return null;
+      }
+
+      if (typeof collection.entries == 'undefined') {
         collection.entries = [];
       }
 
@@ -299,10 +262,36 @@ app.factory("CollectionService", function($http) {
       // return collection.entries[length - 1];
       return length - 1;
     },
-    save: function(collectionId) {
+    setEntry: function(collectionName, entry)
+    {
+      var collection = this.getByName(collectionName);
+      var isFound = false;
+
+      if (typeof collection.entries == 'undefined') {
+        collection.entries = [];
+      }
+
+      for (var i=0, len=collection.entries.length; i<len; i++) {
+        if (collection.entries[i].id == entry.id) {
+          collection.entries[i] = entry;
+          isFound = true;
+          break;
+        }
+      }
+
+      if (! isFound) {
+        collection.entries.push(entry);
+      }
+    },
+    save: function(collectionName)
+    {
       var self = this;
 
-      var collection = this.getByIndex(collectionId);
+      var collection = this.getByName(collectionName);
+
+      if (typeof collection._name == 'undefined') {
+        collection._name = collection.name;
+      }
 
       var name = collection._name;
 
@@ -325,30 +314,28 @@ app.factory("CollectionService", function($http) {
       return $http({method: 'POST', data: data, url: '/orm/collection/' + name})
         .success(function(data) {
           if (typeof data.error == 'undefined') {
-            self.set(collectionId, data);
+            self.set(collectionName, data);
           }
         });
-
-      // var collections = [];
-
-      // for (var i=0,len=data.collections.length; i<len; i++) {
-      //   var item=data.collections[i];
-      //   collections.push({
-      //     name: item.name,
-      //     fields: item.fields
-      //   });
-      // }
-
-      // console.log(data.collections);      
     },
-    saveEntry: function(collectionIndex, entryIndex) {
-      var collection = this.getByIndex(collectionIndex);
-      var entry = this.getEntryByIndex(collectionIndex, entryIndex);
+    saveEntry: function(collectionName, entryId)
+    {
+      var self = this;
+      var collection = this.getByName(collectionName);
+      var entry = this.getEntryById(collectionName, entryId);
+
+      for (var k in entry) {
+        if (k == 'id' && entry.id === null) {
+          delete entry.id;
+          break;
+        }
+      }
+
       // console.log(collection);
-      return $http({method: 'POST', data: entry, url: '/orm/collection/' + collection.name + '/entry'})
-        .success(function(data) {
+      return $http({method: 'POST', data: entry, url: baseUrl + '/collection/' + collection.name + '/entry'})
+        .success(function(result) {
           if (typeof data.error == 'undefined') {
-            // self.set(collectionId, data);
+            self.setEntry(collectionName, result);
           }
         });
     }
@@ -360,59 +347,63 @@ app.controller('BreadcrumbsCtrl', function($scope, AppService) {
 });
 
 app.controller('EntryEditCtrl', function($scope, $routeParams, $location, AppService, CollectionService, flash) {
-  var collectionId = $routeParams.collectionId;
-  var entryId = $routeParams.entryId;
+  var collectionName = $routeParams.collectionName;
+  var entryId = $routeParams.entryId || null;
 
-  $scope.collection = CollectionService.getByIndex(collectionId);
-  $scope.entry = CollectionService.getEntryByIndex(collectionId, entryId);
+  $scope.collection = CollectionService.getByName(collectionName);
+  $scope.entry = CollectionService.getEntryById(collectionName, entryId);
 
   if (! $scope.entry) {
-    entryId = CollectionService.addEntry(collectionId);
-    $scope.entry = CollectionService.getEntryByIndex(collectionId, entryId);
+    CollectionService.addEntry(collectionName);
+    $scope.entry = CollectionService.getEntryById(collectionName, null);
   }
 
-  $scope.save = function() {
-    // flash('success', 'Sorry, can\'t save.');
-
-    CollectionService.saveEntry(collectionId, entryId).success(function(data) {
-      console.log('save', data);
+  $scope.save = function(redirect)
+  {
+    CollectionService.saveEntry($scope.collection.name, $scope.entry.id).success(function(data) {
       if (typeof data.error == 'undefined') {
         flash('success', 'Saved successfully!');
+      }
+    }).then(function(response) {
+      if (entryId === null && redirect !== false) {
+        $location.path('/collection/' + $scope.collection.name + '/entry/' + response.data.id + '/edit');
       }
     });
   };
 
-  $scope.saveAndClose = function() {
-    $location.path('/collection/' + collectionId + '/entries');
-    $scope.save();
+  $scope.saveAndClose = function()
+  {
+    $location.path('/collection/' + $scope.collection.name + '/entries');
+    $scope.save(false);
   };
 
   AppService.setBreadcrumbs([{
-    path: '/collections',
+    path: 'collections',
     name: 'Collections'
   }, {
-    path: '/collection/' + collectionId + '/entries',
-    name: $scope.collection.name
-  }, 'Entry']);
+    path: 'collection/' + $scope.collection.name + '/entries',
+    name: 'Collection' + ' ' + $scope.collection.name + ' ' + 'entries'
+  }, $scope.entry.id ? 'Edit entry': 'Create entry']);
 });
 
 app.controller('EntriesListCtrl', function($scope, $routeParams, $location, AppService, CollectionService) {
-  var collectionId = $routeParams.id;
+  var collectionName = $routeParams.collectionName;
 
-  CollectionService.loadEntries(collectionId);
+  CollectionService.loadEntries(collectionName);
 
-  $scope.collectionId = collectionId;
+  $scope.collectionName = collectionName;
   
   $scope.selectedEntries = [];
 
-  $scope.collection = CollectionService.getByIndex(collectionId);
+  $scope.collection = CollectionService.getByName(collectionName);
 
   if (! $scope.collection) {
     $location.path('/collections');
     return;
   }
 
-  $scope.selectEntry = function(entryId) {
+  $scope.selectEntry = function(entryId)
+  {
     var index = $scope.selectedEntries.indexOf(entryId);
 
     if (index == -1) {
@@ -422,11 +413,13 @@ app.controller('EntriesListCtrl', function($scope, $routeParams, $location, AppS
     }
   };
 
-  $scope.isSelectedEntry = function(entryId) {
+  $scope.isSelectedEntry = function(entryId)
+  {
     return ($scope.selectedEntries.indexOf(entryId) >= 0);
   };
 
-  $scope.selectAll = function() {
+  $scope.selectAll = function()
+  {
     var entries = $scope.collection.entries;
 
     if (! entries) {
@@ -434,17 +427,19 @@ app.controller('EntriesListCtrl', function($scope, $routeParams, $location, AppS
     }
 
     for (var i=0,len=entries.length; i<len; i++) {
-      if ($scope.selectedEntries.indexOf(entries[i].id) == -1) {
-        $scope.selectedEntries.push(entries[i].id);
+      if ($scope.selectedEntries.indexOf(i) == -1) {
+        $scope.selectedEntries.push(i);
       }
     }
   };
 
-  $scope.deselectAll = function() {
+  $scope.deselectAll = function()
+  {
     $scope.selectedEntries = [];
   };
 
-  $scope.isAllSelected = function() {
+  $scope.isAllSelected = function()
+  {
     if (! $scope.selectedEntries || ! $scope.collection.entries) {
       return null;
     }
@@ -452,19 +447,21 @@ app.controller('EntriesListCtrl', function($scope, $routeParams, $location, AppS
     return $scope.selectedEntries.length == $scope.collection.entries.length;
   };
 
-  $scope.isSelected = function() {
+  $scope.isSelected = function()
+  {
     return $scope.selectedEntries && $scope.selectedEntries.length > 0;
   };
 
-  $scope.toDate = function(unixtime) {
+  $scope.toDate = function(unixtime)
+  {
     var date = new Date(parseInt(unixtime) * 1000);
     return date.getDate() + '-' + date.getMonth() + '-' + date.getFullYear();
   };
 
   AppService.setBreadcrumbs([{
-    path: '/collections',
+    path: 'collections',
     name: 'Collections'
-  }, 'Entries of' + ' ' + $scope.collection.name ]);
+  }, 'Collection' + ' ' + $scope.collection.name + ' ' + 'entries' ]);
 });
 
 app.controller('CollectionsListCtrl', function($scope, AppService, CollectionService) {
@@ -472,23 +469,20 @@ app.controller('CollectionsListCtrl', function($scope, AppService, CollectionSer
 
   $scope.collections = CollectionService.all();
 
-  // $scope.$on('appInitialized', function() {
-  //   CollectionService.load();
-  // });
-
-  $scope.removeCollection = function(collectionId) {
-    CollectionService.removeCollection(collectionId);
+  $scope.removeCollection = function(collectionName) {
+    CollectionService.removeCollection(collectionName);
   };
 });
 
 app.controller('CollectionEditCtrl', function($scope, $routeParams, $location, AppService, CollectionService, flash) {
-  var collectionId = $routeParams.id || null;
-  
-  $scope.collection = CollectionService.getByIndex(collectionId);
+  var collectionName = $routeParams.collectionName || null;
+
+  $scope.collectionName = collectionName;
+  $scope.collection = CollectionService.getByName(collectionName);
   
   if (! $scope.collection) {
-    collectionId = CollectionService.add({
-      name: '',
+    CollectionService.add({
+      name: null,
       fields: [
         {
           name: '',
@@ -502,12 +496,13 @@ app.controller('CollectionEditCtrl', function($scope, $routeParams, $location, A
       ]
     });
 
-    $scope.collection = CollectionService.getByIndex(collectionId);
+    $scope.collection = CollectionService.getByName(null);
   }
 
   $scope.activeFieldIndex = null;
 
-  $scope.toggleField = function(index) {
+  $scope.toggleField = function(index)
+  {
     if ($scope.activeFieldIndex == index) {
       $scope.activeFieldIndex = null;
     } else {
@@ -515,9 +510,10 @@ app.controller('CollectionEditCtrl', function($scope, $routeParams, $location, A
     }
   };
 
-  $scope.addField = function() {
-    CollectionService.addField(collectionId, {
-      name: '',
+  $scope.addField = function()
+  {
+    CollectionService.addField($scope.collection.name, {
+      name: null,
       sort: 1,
       type: 'text',
       label: '',
@@ -527,28 +523,35 @@ app.controller('CollectionEditCtrl', function($scope, $routeParams, $location, A
     });
   };
 
-  $scope.removeField = function(index) {
-    CollectionService.removeField(collectionId, index);
+  $scope.removeField = function(index)
+  {
+    CollectionService.removeField($scope.collection.name, index);
   };
 
-  $scope.save = function() {
-    CollectionService.save(collectionId)
+  $scope.save = function()
+  {
+    CollectionService.save($scope.collection.name)
       .then(function(data) {
         flash('success', 'Saved successfully!');
+
+        if (collectionName === null) {
+          $location.path('/collection/' + $scope.collection.name + '/edit');
+        }
       });
 
     // CollectionService.save(collectionId);
   };
 
-  $scope.saveAndClose = function() {
+  $scope.saveAndClose = function()
+  {
     $location.path('/collections');
-    $scope.save();
+    $scope.save($scope.collection.name);
   };
 
   AppService.setBreadcrumbs([{
-    path: '/collections',
+    path: 'collections',
     name: 'Collections'
-  }, $scope.collection.name ]);
+  }, $scope.collection.name ? 'Edit collection' + ' ' + $scope.collection.name: 'Create collection' ]);
 });
 
 })(angular);
