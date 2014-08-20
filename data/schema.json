@@ -17,6 +17,17 @@
                 "defaultValue": "",
                 "required": false,
                 "displayed": true
+            },
+            {
+                "name": "photo",
+                "sort": 1,
+                "type": "collection",
+                "collection": "photos",
+                "many": false,
+                "label": "Photo",
+                "defaultValue": "",
+                "required": false,
+                "displayed": true
             }
         ],
         "sort": "second_name",
@@ -121,5 +132,30 @@
         ],
         "sort": "number_col",
         "sortType": "1"
+    },
+    {
+        "name": "photos",
+        "fields": [
+            {
+                "name": "url",
+                "sort": 1,
+                "type": "media",
+                "label": "",
+                "defaultValue": "",
+                "required": true,
+                "displayed": true
+            },
+            {
+                "name": "name",
+                "sort": 1,
+                "type": "text",
+                "label": "",
+                "defaultValue": "",
+                "required": false,
+                "displayed": false
+            }
+        ],
+        "sort": null,
+        "sortType": "-1"
     }
 ]

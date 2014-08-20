@@ -32,16 +32,7 @@ class Storage
    */
   public function __get($name)
   {
-    $this->setCollection($name);
-    return $this;
-  }
-
-  /**
-   *
-   */
-  function setCollection($name)
-  {
-    $this->collectionName = $name;
+    $this->collection($name);
     return $this;
   }
 
@@ -217,6 +208,15 @@ class Storage
   /**
    *
    */
+  public function collection($name)
+  {
+    $this->collectionName = $name;
+    return $this;
+  }
+
+  /**
+   *
+   */
   public function sort(array $sort)
   {
     $this->sort = $sort;
@@ -253,7 +253,7 @@ class Storage
   /**
    *
    */
-  public function populate(array $populate)
+  public function populate($populate)
   {
     $this->populate = $populate;
     return $this;
@@ -328,7 +328,7 @@ class Storage
   /**
    *
    */
-  public function find($collectionName, array $filter, array $sort, array $fields, array $populate, $limit, $skip)
+  public function find($collectionName, array $filter, array $sort, array $fields, $populate, $limit, $skip)
   {
     if (! $collectionName) {
       throw new Exception("Collection name is required.");
@@ -421,7 +421,19 @@ class Storage
       return $results;
     }
 
-    if (! empty($populate)) {
+    if (! empty($populate) && is_bool($populate) && $populate === true) {
+      $populate = [];
+
+      $scheme = $this->getCollectionSchema($collectionName);
+
+      foreach ($scheme['fields'] as $field) {
+        if ($field['type'] == 'collection') {
+          $populate[] = $field['name'];
+        }
+      }
+    }
+    
+    if (! empty($populate) && is_array($populate)) {
       foreach ($populate as $key=>$value) {
         if (is_array($value)) {
           $column = $key;
@@ -436,12 +448,6 @@ class Storage
         if (! $fieldSchema || ! isset($fieldSchema['collection'])) {
           continue;
         }
-
-        // if (! isset($this->schema[$collectionName]['fields'][$column])) {
-        //   continue;
-        // }
-
-        // $collectionField = $this->schema[$collectionName]['fields'][$column];
 
         $populateCollectionName = $fieldSchema['collection'];
         $many = isset($fieldSchema['many']) ? (boolean) $fieldSchema['many']: false;
@@ -554,8 +560,6 @@ class Storage
       return false;
     }
 
-    // $options = $this->schema[$this->collectionName];
-
     $sqlParams = [];
 
     if (isset($data['id'])) {
@@ -589,10 +593,6 @@ class Storage
           continue;
         }
 
-        // if (! isset($options['fields'][$column])) {
-        //   continue;
-        // }
-
         $placeholder = ':' . $column . '_' . uniqid();
       
         $sqlColumns[] = $column;
@@ -615,7 +615,7 @@ class Storage
     if ($returnRecord) {
       $id = isset($data['id']) ? $data['id']: $this->connection->lastInsertId();
 
-      return $this->setCollection($this->collectionName)->filter(['id'=>$id])->one();
+      return $this->collection($this->collectionName)->filter([ 'id'=>$id ])->one();
     }
 
     return true;

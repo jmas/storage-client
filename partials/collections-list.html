@@ -1,14 +1,14 @@
 <div id="collections">
   <div class="collections-options">
-    <a href="#collection/create" class="btn trusty">Create</a>
+    <a href="#collections/create" class="btn trusty">Create</a>
     <!-- <a href="#" class="btn">Select All</a> -->
     <!-- <a href="#" class="btn danger">Remove Selected</a> -->
   </div>
   <div ng-repeat="item in collections" class="collection-list" ng-if="item.name">
     <div class="item">
-      <div class="name"><a href="collection/{{item.name}}/entries">{{item.name}}</a></div>
+      <div class="name"><a href="#collections/{{item.name}}/entries">{{item.name}}</a></div>
       <div class="options">
-        <a href="collection/{{item.name}}/edit"><img src="images/setup.png" /></a>
+        <a href="#collections/{{item.name}}/edit"><img src="images/setup.png" /></a>
         <a ng-click="removeCollection(item.name)"><img src="images/remove.png" /></a>
       </div>
     </div>

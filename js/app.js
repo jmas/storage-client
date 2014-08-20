@@ -10,30 +10,30 @@ var app = a.module('app', [
 ]);
 
 app.config(function($routeProvider, $locationProvider) {
-  $locationProvider.html5Mode(true);
+  $locationProvider.html5Mode(false);
 
   $routeProvider.
     when('/collections', {
       templateUrl: 'partials/collections-list.html',
       controller: 'CollectionsListCtrl'
     }).
-    when('/collection/:collectionName/edit', {
+    when('/collections/:collectionName/edit', {
       templateUrl: 'partials/collection-edit.html',
       controller: 'CollectionEditCtrl'
     }).
-    when('/collection/create', {
+    when('/collections/create', {
       templateUrl: 'partials/collection-edit.html',
       controller: 'CollectionEditCtrl'
     }).
-    when('/collection/:collectionName/entries', {
+    when('/collections/:collectionName/entries', {
       templateUrl: 'partials/entries-list.html',
       controller: 'EntriesListCtrl'
     }).
-    when('/collection/:collectionName/entry/:entryId/edit', {
+    when('/collections/:collectionName/entries/:entryId/edit', {
       templateUrl: 'partials/entry-edit.html',
       controller: 'EntryEditCtrl'
     }).
-    when('/collection/:collectionName/entry/create', {
+    when('/collections/:collectionName/entries/create', {
       templateUrl: 'partials/entry-edit.html',
       controller: 'EntryEditCtrl'
     }).
@@ -58,6 +58,109 @@ app.directive('field', function() {
     templateUrl: 'partials/field.html'
   };
 });
+
+app.directive('entryBrowserDialog', function(CollectionService) {
+  return {
+    restrict: 'E',
+    templateUrl: 'partials/entry-browser.html',
+    controller: function($scope, $rootScope, CollectionService) {
+      $scope.shown = false;
+      $scope.title = '';
+
+      $rootScope.$on('entryBrowser:choose', function(event, collection, entry, fieldName) {
+
+        var field = CollectionService.getField(collection.name, fieldName);
+        var collection = CollectionService.getByName(field.collection);
+
+        $scope.shown = true;
+        $scope.title = 'Choose Entry';
+        $scope.collection = collection;
+        $scope.activeItems = [];
+
+        if (field.many && entry[fieldName] && entry[fieldName].length > 0) {
+          for (var i=0,len=entry[fieldName].length; i<len; i++) {
+            $scope.activeItems.push(entry[fieldName][i].id);
+          }
+        } else if (field.many) {
+          entry[fieldName] = [];
+        } else if (! field.many && entry[fieldName]) {
+          $scope.activeItems.push(entry[fieldName].id);
+        } else {
+          entry[fieldName] = null;
+        }
+
+        $scope.pretifyValue = function(val, field)
+        {
+          switch (field.type) {
+            case 'media':
+              if (val.match(/(jpg|jpeg|png|gif)$/)) {
+                val = '<a href="' + val + '" target="_blank"><img src="' + val + '" /> ' + val + '</a>';
+              }
+              break;
+          }
+
+          return val;
+        };
+
+        $scope.toggleActiveItem = function(item)
+        {
+          if (field.many) {
+            if (! $scope.isItemActive(item)) {
+              $scope.activeItems.push(item.id);
+            } else {
+              $scope.activeItems.splice($scope.activeItems.indexOf(item.id), 1);
+            }
+          } else {
+            $scope.activeItems.splice(0, $scope.activeItems.length);
+            $scope.activeItems.push(item.id);
+          }
+        };
+
+        $scope.isItemActive = function(item)
+        {
+          return ! ($scope.activeItems.indexOf(item.id) === -1);
+        };
+
+        $scope.closeDialog = function()
+        {
+          $scope.shown = false;
+        };
+
+        $scope.choose = function()
+        {
+          var entries = [];
+
+          for (var i=0,len=collection.entries.length; i<len; i++) {
+            if ($scope.isItemActive(collection.entries[i])) {
+              entries.push(collection.entries[i]);
+            }
+          }
+
+          if (field.many) {
+            entry[fieldName] = entries;
+          } else {
+            entry[fieldName] = entries.pop();
+          }
+
+          $scope.closeDialog();
+        };
+
+        CollectionService.loadEntries(field.collection);
+      });
+    }
+  };
+});
+
+// app.directive('fieldValue', function() {
+//   return {
+//     restrict: 'E',
+//     scope: {
+//       value: '=',
+//       field: '='
+//     },
+//     templateUrl: 'partials/field-value.html'
+//   };
+// });
 
 app.factory("AppService", function() {
   var app = {
@@ -99,7 +202,7 @@ app.factory("CollectionService", function($http) {
         collection.entries.splice(0, collection.entries.length);
       }
 
-      return $http({method: 'GET', url: baseUrl + '/collection/' + collection.name + '/entries'}).success(function(result) {
+      return $http({method: 'GET', url: baseUrl + '/collections/' + collection.name + '/entries'}).success(function(result) {
         self.setEntries(collectionName, result);
       });
     },
@@ -201,6 +304,18 @@ app.factory("CollectionService", function($http) {
       }
 
       return collection.entries[entryId] || null;
+    },
+    getField: function(collectionName, fieldName)
+    {
+      var collection = this.getByName(collectionName);
+
+      for (var i=0, len=collection.fields.length; i<len; i++) {
+        if (collection.fields[i].name == fieldName) {
+          return collection.fields[i];
+        }
+      }
+
+      return null;
     },
     addField: function(collectionName, data)
     {
@@ -311,7 +426,7 @@ app.factory("CollectionService", function($http) {
         data[k] = collection[k]; 
       }
 
-      return $http({method: 'POST', data: data, url: '/orm/collection/' + name})
+      return $http({method: 'POST', data: data, url: baseUrl + '/collections/' + name})
         .success(function(data) {
           if (typeof data.error == 'undefined') {
             self.set(collectionName, data);
@@ -332,7 +447,7 @@ app.factory("CollectionService", function($http) {
       }
 
       // console.log(collection);
-      return $http({method: 'POST', data: entry, url: baseUrl + '/collection/' + collection.name + '/entry'})
+      return $http({method: 'POST', data: entry, url: baseUrl + '/collections/' + collection.name + '/entries'})
         .success(function(result) {
           if (typeof data.error == 'undefined') {
             self.setEntry(collectionName, result);
@@ -346,12 +461,13 @@ app.controller('BreadcrumbsCtrl', function($scope, AppService) {
   $scope.app = AppService;
 });
 
-app.controller('EntryEditCtrl', function($scope, $routeParams, $location, AppService, CollectionService, flash) {
+app.controller('EntryEditCtrl', function($scope, $rootScope, $routeParams, $location, AppService, CollectionService, flash) {
   var collectionName = $routeParams.collectionName;
   var entryId = $routeParams.entryId || null;
 
   $scope.collection = CollectionService.getByName(collectionName);
   $scope.entry = CollectionService.getEntryById(collectionName, entryId);
+  $scope.collectionName = collectionName;
 
   if (! $scope.entry) {
     CollectionService.addEntry(collectionName);
@@ -366,22 +482,45 @@ app.controller('EntryEditCtrl', function($scope, $routeParams, $location, AppSer
       }
     }).then(function(response) {
       if (entryId === null && redirect !== false) {
-        $location.path('/collection/' + $scope.collection.name + '/entry/' + response.data.id + '/edit');
+        $location.path('collections/' + $scope.collection.name + '/entries/' + response.data.id + '/edit');
       }
     });
   };
 
+  $scope.getCollectionFields = function(collectionName)
+  {
+    return CollectionService.getByName(collectionName).fields;
+  };
+
   $scope.saveAndClose = function()
   {
-    $location.path('/collection/' + $scope.collection.name + '/entries');
+    $location.path('collections/' + $scope.collection.name + '/entries');
     $scope.save(false);
+  };
+
+  $scope.pretifyValue = function(val, field)
+  {
+    switch (field.type) {
+      case 'media':
+        if (val.match(/(jpg|jpeg|png|gif)$/)) {
+          val = '<a href="' + val + '" target="_blank"><img src="' + val + '" /> ' + val + '</a>';
+        }
+        break;
+    }
+
+    return val;
+  };
+
+  $scope.choose = function(fieldName)
+  {
+    $rootScope.$emit('entryBrowser:choose', $scope.collection, $scope.entry, fieldName);
   };
 
   AppService.setBreadcrumbs([{
     path: 'collections',
     name: 'Collections'
   }, {
-    path: 'collection/' + $scope.collection.name + '/entries',
+    path: 'collections/' + $scope.collection.name + '/entries',
     name: 'Collection' + ' ' + $scope.collection.name + ' ' + 'entries'
   }, $scope.entry.id ? 'Edit entry': 'Create entry']);
 });
@@ -458,6 +597,19 @@ app.controller('EntriesListCtrl', function($scope, $routeParams, $location, AppS
     return date.getDate() + '-' + date.getMonth() + '-' + date.getFullYear();
   };
 
+  $scope.pretifyValue = function(val, field)
+  {
+    switch (field.type) {
+      case 'media':
+        if (val.match(/(jpg|jpeg|png|gif)$/)) {
+          val = '<a href="' + val + '" target="_blank"><img src="' + val + '" /> ' + val + '</a>';
+        }
+        break;
+    }
+
+    return val;
+  };
+
   AppService.setBreadcrumbs([{
     path: 'collections',
     name: 'Collections'
@@ -528,24 +680,22 @@ app.controller('CollectionEditCtrl', function($scope, $routeParams, $location, A
     CollectionService.removeField($scope.collection.name, index);
   };
 
-  $scope.save = function()
+  $scope.save = function(redirect)
   {
     CollectionService.save($scope.collection.name)
       .then(function(data) {
         flash('success', 'Saved successfully!');
 
-        if (collectionName === null) {
-          $location.path('/collection/' + $scope.collection.name + '/edit');
+        if (collectionName === null && redirect !== false) {
+          $location.path('collections/' + $scope.collection.name + '/edit');
         }
       });
-
-    // CollectionService.save(collectionId);
   };
 
   $scope.saveAndClose = function()
   {
-    $location.path('/collections');
-    $scope.save($scope.collection.name);
+    $location.path('collections');
+    $scope.save(false);
   };
 
   AppService.setBreadcrumbs([{

@@ -45,7 +45,7 @@ $app->put('/collection', function () use ($app) {
   // create new
 });
 
-$app->post('/collection/:name', function ($name) use ($app) {
+$app->post('/collections/:name', function ($name) use ($app) {
   $data = json_decode($app->request->getBody(), true);
 
   // $name = $data['_name'];
@@ -63,11 +63,11 @@ $app->post('/collection/:name', function ($name) use ($app) {
   }
 });
 
-$app->delete('/collection/:name', function() use ($app) {
+$app->delete('/collections/:name', function() use ($app) {
 
 });
 
-$app->get('/collection/:name/entries', function($name) use ($app) {
+$app->get('/collections/:name/entries', function($name) use ($app) {
   $collection = $app->storage->{$name};
 
   $schema = $collection->getCollectionSchema($name);
@@ -78,16 +78,16 @@ $app->get('/collection/:name/entries', function($name) use ($app) {
     $collection->sort([ $schema['sort'] => $sortType ]);
   }
 
-  $entries = $collection->all();
+  $entries = $collection->populate(true)->all();
 
   $app->response->write(json_encode($entries));
 });
 
-$app->get('/test', function() use ($app) {
-  $app->response->write(json_encode($app->storage->users1->all()));
-});
+// $app->get('/test', function() use ($app) {
+//   $app->response->write(json_encode($app->storage->users1->all()));
+// });
 
-$app->post('/collection/:name/entry', function($name) use ($app) {
+$app->post('/collections/:name/entries', function($name) use ($app) {
   $collection = $app->storage->{$name};
 
   $data = json_decode($app->request->getBody(), true);
@@ -104,7 +104,7 @@ $app->post('/collection/:name/entry', function($name) use ($app) {
 });
 
 $app->get('/test', function() use ($app) {
-  $app->response->write(json_encode($app->storage->users1->all()));
+  $app->response->write(json_encode($app->storage->collection('users')->populate(['photo'])->all()));
 });
 
 
