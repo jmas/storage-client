@@ -631,6 +631,7 @@ app.controller('CollectionEditCtrl', function($scope, $routeParams, $location, A
 
   $scope.collectionName = collectionName;
   $scope.collection = CollectionService.getByName(collectionName);
+  $scope.collections = CollectionService.all();
   
   if (! $scope.collection) {
     CollectionService.add({

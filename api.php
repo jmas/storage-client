@@ -88,7 +88,7 @@ $app->get('/collections/:name/entries', function($name) use ($app) {
 // });
 
 $app->post('/collections/:name/entries', function($name) use ($app) {
-  $collection = $app->storage->{$name};
+  $collection = $app->storage->collection($name);
 
   $data = json_decode($app->request->getBody(), true);
 
@@ -97,6 +97,8 @@ $app->post('/collections/:name/entries', function($name) use ($app) {
   }
 
   $result = $collection->save($data, true);
+
+  $result = $collection->populate(true)->filter(['id'=>$result['id']])->one();
 
   if ($result !== false) {
     $app->response->write(json_encode($result));

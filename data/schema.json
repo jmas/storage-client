@@ -28,6 +28,17 @@
                 "defaultValue": "",
                 "required": false,
                 "displayed": true
+            },
+            {
+                "name": "posts",
+                "sort": 1,
+                "type": "collection",
+                "label": "Posts",
+                "defaultValue": "",
+                "required": false,
+                "displayed": true,
+                "collection": "posts",
+                "many": true
             }
         ],
         "sort": "second_name",
@@ -37,11 +48,11 @@
         "name": "posts",
         "fields": [
             {
-                "name": "users",
-                "label": "Users",
-                "type": "collection",
-                "collection": "users",
-                "many": true
+                "name": "title",
+                "label": "Title",
+                "type": "text",
+                "required": true,
+                "displayed": true
             },
             {
                 "name": "content",
@@ -49,14 +60,15 @@
                 "type": "wysiwyg"
             },
             {
-                "name": "title",
-                "label": "Title",
-                "type": "text",
-                "required": true,
-                "displayed": true
+                "name": "users",
+                "label": "Users",
+                "type": "collection",
+                "collection": "users",
+                "many": true
             }
         ],
-        "sort": null
+        "sort": null,
+        "sortType": "-1"
     },
     {
         "name": "test4",
@@ -69,8 +81,21 @@
                 "defaultValue": "",
                 "required": false,
                 "displayed": true
+            },
+            {
+                "name": "posts",
+                "sort": 1,
+                "type": "collection",
+                "label": "Posts",
+                "defaultValue": "",
+                "required": false,
+                "displayed": true,
+                "collection": "posts",
+                "many": true
             }
-        ]
+        ],
+        "sort": null,
+        "sortType": "-1"
     },
     {
         "name": "test",

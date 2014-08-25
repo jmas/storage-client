@@ -69,9 +69,19 @@
                 <label>Required</label>
                 <span class="field"><input type="checkbox" ng-model="item.required" /></span>
               </div>
-              <div class="field-option">
-                <label>Options</label>
-                <span class="field"><input type="text" /></span>
+              <div class="field-option" ng-if="item.type=='collection'">
+                <label>Collection</label>
+                <span class="field">
+                  <select ng-model="item.collection">
+                    <option value="{{collectionItem.name}}" ng-repeat="collectionItem in collections" ng-selected="item.collection == collectionItem.name">{{collectionItem.name}}</option>
+                  </select>
+                </span>
+              </div>
+              <div class="field-option" ng-if="item.type=='collection'">
+                <label>Many</label>
+                <span class="field">
+                  <input type="checkbox" ng-model="item.many" />
+                </span>
               </div>
             </div>
           </div>
