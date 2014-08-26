@@ -63,6 +63,130 @@ class Storage
   /**
    *
    */
+  public function updateCollectionSchema($currentCollectionName, $collectionSchema)
+  {
+    $collectionName = $collectionSchema['name'];
+    $currentCollectionSchema = $this->getCollectionSchema($currentCollectionName);
+
+    $batchSql = [];
+
+    if (! $currentCollectionSchema) {
+      // create table
+      $batchSql[] = "CREATE TABLE IF NOT EXISTS {$currentCollectionName} (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY)";
+
+      $currentCollectionSchema = [
+        'name' => $currentCollectionName,
+        'fields' => [],
+      ];
+    }
+
+    $collectionFields = $collectionSchema['fields'];
+    $currentCollectionFields = $currentCollectionSchema['fields'];
+
+    // rename, change type for existing fields
+    foreach ($collectionFields as $collectionField) {
+      $isFieldExists = false;
+
+      foreach ($currentCollectionFields as $currentCollectionField) {
+        if ($collectionField['_name'] == $currentCollectionField['name']) {
+          $isFieldExists = true;
+
+          if ($collectionField['type'] == 'collectionMany') {
+            break;
+          }
+
+          if ($collectionField['name'] != $currentCollectionField['name'] || $collectionField['type'] != $currentCollectionField['type']) {
+            // rename field OR change field type
+            $fieldSqlType = $this->generateFieldSqlType($collectionField);
+
+            $batchSql[] = "ALTER TABLE {$currentCollectionName} CHANGE {$currentCollectionField['name']} {$collectionField['name']} {$fieldSqlType}";
+          }
+
+          break;
+        }
+      }
+
+      if (! $isFieldExists) {
+        if ($collectionField['type'] != 'collectionMany') {
+          // create new field
+          $fieldSqlType = $this->generateFieldSqlType($collectionField);
+
+          $batchSql[] = "ALTER TABLE {$currentCollectionName} ADD {$collectionField['name']} {$fieldSqlType}";
+        } else {
+          // create junction table
+          $tableName = $this->makeJunctionTableName($collectionName, $collectionField['collection']);
+
+          $batchSql[] = "CREATE TABLE IF NOT EXISTS {$tableName}({$collectionField['collection']}Id INT, {$collectionName}Id INT)";
+        }
+      }
+    }
+
+    // drop removed fields
+    foreach ($currentCollectionFields as $currentCollectionField) {
+      $isFieldExists = false;
+
+      foreach ($collectionFields as $collectionField) {
+        if ($currentCollectionField['name'] == $collectionField['_name']) {
+          $isFieldExists = true;
+          break;
+        }
+      }
+
+      if (! $isFieldExists) {
+        if ($currentCollectionField['type'] != 'collectionMany') {
+          // drop field
+          $batchSql[] = "ALTER TABLE {$currentCollectionName} DROP {$currentCollectionFields['name']}";
+        }
+      }
+    }
+
+    // check for renaming current collection
+    if ($currentCollectionName != $collectionName) {
+      // update table name
+      $batchSql[] = "ALTER TABLE {$currentCollectionName} RENAME {$collectionName}";
+    }
+
+    // remove _name property form schema and fields
+    unset($collectionSchema['_name']);
+
+    for ($i=0, $len=count($collectionSchema['fields']); $i<$len; $i++) {
+      unset($collectionSchema['fields'][$i]['_name']);
+    }
+
+    // update current collection schema
+    $isCollectionExists = false;
+
+    for ($i=0, $len=count($this->schema); $i<$len; $i++) {
+      if ($this->schema[$i]['name'] == $collectionName) {
+        $this->schema[$i] = $collectionSchema;
+        $isCollectionExists = true;
+        break;
+      }
+    }
+
+    // add new collection
+    if (! $isCollectionExists) {
+      $this->schema[] = $collectionSchema;
+    }
+
+    // var_dump($batchSql);
+    // die;
+
+    // execute batch sql
+    foreach ($batchSql as $sql) {
+      $sth = $this->connection->prepare($sql);
+
+      if ($sth->execute() === false) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   *
+   */
   public function setCollectionSchema($name, $schema)
   {
     $currentSchema = $this->getCollectionSchema($name);
@@ -72,18 +196,30 @@ class Storage
     if ($currentSchema !== null) {
       if ($schema['name'] != $currentSchema['name']) {
         $batchSql[] = "ALTER TABLE {$currentSchema['name']} RENAME {$schema['name']}";
-      }
+      
+        $junctionTablesToRename = [];
 
-      // check related collections fields for changing collection name
-      foreach ($this->schema as $i => $collection) {
-        if (empty($collection['fields'])) {
-          continue;
-        }
-
-        foreach ($collection['fields'] as $j => $field) {
-          if ($field['type'] == 'collection' && $field['many'] === true && $field['collection'] == $schema['_name']) {
-            $this->schema[$i]['fields'][$j]['collection'] = $schema['name'];
+        // check related collections fields for changing collection name
+        foreach ($this->schema as $i => $collection) {
+          if (empty($collection['fields'])) {
+            continue;
           }
+
+          // foreach ($collection['fields'] as $j => $field) {
+          //   if ($field['type'] == 'collection' && $field['many'] === true && $field['collection'] == $schema['_name']) {
+          //     $this->schema[$i]['fields'][$j]['collection'] = $schema['name'];
+
+          //     $oldTableName = $this->makeJunctionTableName($field['name'], $collection['name']);
+          //     $newTableName = $this->makeJunctionTableName($field['name'], $schema['name']);
+          //     var_dump("ALTER TABLE {$oldTableName} RENAME {$newTableName}"); die;
+          //     $batchSql[] = "ALTER TABLE {$oldTableName} RENAME {$newTableName}";
+
+          //     // // rename association table
+          //     // if (in_array(, haystack)) {
+          //     //   $junctionTablesToRename[] = ;
+          //     // }
+          //   }
+          // }
         }
       }
     } else {
@@ -129,7 +265,7 @@ class Storage
     foreach ($schema['fields'] as $field) {
       $isFound = false;
 
-      if ($field['type'] != 'collection' || ($field['type'] == 'collection' && $field['many'] === false)) {
+      if ($field['type'] != 'collectionMany') {
         foreach ($currentSchema['fields'] as $currentField) {
           if (isset($field['_name']) && $field['_name'] == $currentField['name']) {
             $isFound = true;
@@ -175,27 +311,28 @@ class Storage
 
           // }
 
-          if ($field['_name'] != $currentField['name']) {
-            $oldTableName = $this->makeJunctionTableName($field['_name'], $currentSchema['name']);
-            $newTableName = $this->makeJunctionTableName($field['name'], $currentSchema['name']);
+          // if ($field['_name'] != $currentField['name']) {
+          //   $oldTableName = $this->makeJunctionTableName($field['_name'], $currentSchema['name']);
+          //   $newTableName = $this->makeJunctionTableName($field['name'], $currentSchema['name']);
 
-            $batchSql[] = "ALTER TABLE {$oldTableName} RENAME {$newTableName}";
-          }
+          //   $batchSql[] = "ALTER TABLE {$oldTableName} RENAME {$newTableName}";
+          // }
 
           if ($field['collection'] != $currentField['collection']) {
             // $oldTableName = $this->makeJunctionTableName($field['name'], $currentField['collection']);
-            $tableName = $this->makeJunctionTableName($field['name'], $currentSchema['name']);
+            $oldTableName = $this->makeJunctionTableName($currentField['collection'], $currentSchema['name']);
+            $newTableName = $this->makeJunctionTableName($field['collection'], $currentSchema['name']);
+
             // $newTableName = $this->makeJunctionTableName($field['name'], $currentSchema['name']);
 
-            //$batchSql[] = "ALTER TABLE {$oldTableName} RENAME {$newTableName}";
-
-            $batchSql[] = "ALTER TABLE {$tableName} CHANGE {$currentField['collection']}Id {$field['collection']}Id INT";
+            $batchSql[] = "ALTER TABLE {$oldTableName} RENAME {$newTableName}";
+            $batchSql[] = "ALTER TABLE {$newTableName} CHANGE {$currentField['collection']}Id {$field['collection']}Id INT";
           }
         }
         // if table not created - create table
         else {
-          $tableName = $this->makeJunctionTableName($field['name'], $currentSchema['name']);
-          $batchSql[] = "CREATE TABLE {$tableName}({$schema['name']}Id INT, {$field['collection']}Id INT)";
+          $tableName = $this->makeJunctionTableName($field['collection'], $currentSchema['name']);
+          $batchSql[] = "CREATE TABLE {$tableName}({$field['collection']}Id INT, {$currentSchema['name']}Id INT)";
         }
       }
     }
@@ -204,7 +341,7 @@ class Storage
     foreach ($currentSchema['fields'] as $currentField) {
       $isFound = false;
 
-      if ($currentField['type'] == 'collection' && $currentField['many'] === true) {
+      if ($currentField['type'] == 'collectionMany') {
         continue;
       }
 
@@ -498,7 +635,7 @@ class Storage
       $scheme = $this->getCollectionSchema($collectionName);
 
       foreach ($scheme['fields'] as $field) {
-        if ($field['type'] == 'collection') {
+        if ($field['type'] == 'collectionOne' || $field['type'] == 'collectionMany') {
           $populate[] = $field['name'];
         }
       }
@@ -521,7 +658,7 @@ class Storage
         }
 
         $populateCollectionName = $fieldSchema['collection'];
-        $many = isset($fieldSchema['many']) ? (boolean) $fieldSchema['many']: false;
+        $many = $fieldSchema['type'] == 'collectionMany' ? true: false;
 
         if (! empty($fields)) {
           if (! in_array('id', $fields)) {
@@ -642,7 +779,7 @@ class Storage
       foreach ($data as $column=>$value) {
         $fieldSchema = $this->getFieldSchema($column);
 
-        if (! $fieldSchema || (!empty($fieldSchema['collection']) && isset($fieldSchema['many']) && $fieldSchema['many'] === true)) {
+        if (! $fieldSchema || $fieldSchema['type'] == 'collectionMany') {
           continue;
         }
 
@@ -660,7 +797,7 @@ class Storage
       foreach ($data as $column=>$value) {
         $fieldSchema = $this->getFieldSchema($column);
 
-        if (! $fieldSchema || (!empty($fieldSchema['collection']) && isset($fieldSchema['many']) && $fieldSchema['many'] === true)) {
+        if (! $fieldSchema || $fieldSchema['type'] == 'collectionMany') {
           continue;
         }
 
@@ -690,7 +827,7 @@ class Storage
     foreach ($data as $column=>$value) {
       $fieldSchema = $this->getFieldSchema($column);
 
-      if (empty($fieldSchema['collection']) || (!empty($fieldSchema['collection']) && isset($fieldSchema['many']) && $fieldSchema['many'] === false)) {
+      if ($fieldSchema['type'] != 'collectionMany') {
         continue;
       }
 
@@ -725,7 +862,7 @@ class Storage
     }
 
     if ($returnRecord) {
-      return $this->collection($this->collectionName)->filter([ 'id'=>$id ])->one();
+      return $this->collection($this->collectionName)->filter([ 'id'=>$id ])->populate(true)->one();
     }
 
     return true;
@@ -757,5 +894,42 @@ class Storage
     $names = implode('', $names);
 
     return $names;
+  }
+
+  /**
+   *
+   */
+  private function generateFieldSqlType($field)
+  {
+    $sql = ' VARCHAR(1000) ';
+
+    switch ($field['type']) {
+      case 'text':
+      case 'password':
+      case 'select':
+        $sql = ' VARCHAR(1000) ';
+        break;
+      case 'boolean':
+        $sql = ' INT(1) NOT NULL DEFAULT "' . (isset($field['defaultValue']) && $field['defaultValue'] === true ? '1': '0') . '" ';
+        break;
+      case 'multiline':
+      case 'wysiwyg':
+        $sql = ' TEXT ';
+        break;
+      case 'datetime':
+        $sql = ' DATETIME ';
+        break;
+      case 'number':
+        $sql = ' INT NOT NULL DEFAULT "' . (isset($field['defaultValue']) && $field['defaultValue'] === true ? (int)$field['defaultValue']: '0') . '" ';
+        break;
+      case 'float':
+        $sql = ' FLOAT NOT NULL DEFAULT "' . (isset($field['defaultValue']) && $field['defaultValue'] === true ? (float)$field['defaultValue']: '0') . '" ';
+        break;
+      case 'collectionOne':
+        $sql = ' INT ';
+        break;
+    }
+
+    return $sql;
   }
 }

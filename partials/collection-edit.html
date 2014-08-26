@@ -51,7 +51,8 @@
                   <option value="number">Number</option>
                   <option value="float">Float Number</option>
                   <option value="media">Media</option>
-                  <option value="collection">Collection</option>
+                  <option value="collectionOne">Collection entry</option>
+                  <option value="collectionMany">Collection entries</option>
                 </select>
               </div>
               <div class="field-setup-option">
@@ -69,18 +70,12 @@
                 <label>Required</label>
                 <span class="field"><input type="checkbox" ng-model="item.required" /></span>
               </div>
-              <div class="field-option" ng-if="item.type=='collection'">
+              <div class="field-option" ng-if="item.type=='collectionOne' || item.type=='collectionMany'">
                 <label>Collection</label>
                 <span class="field">
                   <select ng-model="item.collection">
                     <option value="{{collectionItem.name}}" ng-repeat="collectionItem in collections" ng-selected="item.collection == collectionItem.name">{{collectionItem.name}}</option>
                   </select>
-                </span>
-              </div>
-              <div class="field-option" ng-if="item.type=='collection'">
-                <label>Many</label>
-                <span class="field">
-                  <input type="checkbox" ng-model="item.many" />
                 </span>
               </div>
             </div>

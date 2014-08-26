@@ -6,10 +6,13 @@ var app = a.module('app', [
   'ngRoute',
   'textAngular',
   'flash',
-  'ngRepeatReorder'
+  'ngRepeatReorder',
+  'angular-loading-bar'
 ]);
 
-app.config(function($routeProvider, $locationProvider) {
+app.config(function($routeProvider, $locationProvider, cfpLoadingBarProvider) {
+  cfpLoadingBarProvider.includeSpinner = false;
+  
   $locationProvider.html5Mode(false);
 
   $routeProvider.
@@ -71,19 +74,20 @@ app.directive('entryBrowserDialog', function(CollectionService) {
 
         var field = CollectionService.getField(collection.name, fieldName);
         var collection = CollectionService.getByName(field.collection);
+        var many = (field.type == 'collectionMany' ? true: false);
 
         $scope.shown = true;
         $scope.title = 'Choose Entry';
         $scope.collection = collection;
         $scope.activeItems = [];
 
-        if (field.many && entry[fieldName] && entry[fieldName].length > 0) {
+        if (many && entry[fieldName] && entry[fieldName].length > 0) {
           for (var i=0,len=entry[fieldName].length; i<len; i++) {
             $scope.activeItems.push(entry[fieldName][i].id);
           }
-        } else if (field.many) {
+        } else if (many) {
           entry[fieldName] = [];
-        } else if (! field.many && entry[fieldName]) {
+        } else if (! many && entry[fieldName]) {
           $scope.activeItems.push(entry[fieldName].id);
         } else {
           entry[fieldName] = null;
@@ -104,7 +108,7 @@ app.directive('entryBrowserDialog', function(CollectionService) {
 
         $scope.toggleActiveItem = function(item)
         {
-          if (field.many) {
+          if (many) {
             if (! $scope.isItemActive(item)) {
               $scope.activeItems.push(item.id);
             } else {
@@ -136,7 +140,7 @@ app.directive('entryBrowserDialog', function(CollectionService) {
             }
           }
 
-          if (field.many) {
+          if (many) {
             entry[fieldName] = entries;
           } else {
             entry[fieldName] = entries.pop();

@@ -1,183 +1,129 @@
 [
     {
-        "name": "users",
+        "name": "user",
         "fields": [
             {
                 "name": "name",
-                "label": "Name",
+                "sort": 1,
                 "type": "text",
+                "label": "Name",
+                "defaultValue": "",
+                "required": false,
+                "displayed": true
+            },
+            {
+                "name": "email",
+                "sort": 1,
+                "type": "text",
+                "label": "E-mail",
+                "defaultValue": "",
                 "required": true,
                 "displayed": true
             },
             {
-                "name": "second_name",
+                "name": "password",
                 "sort": 1,
-                "type": "text",
-                "label": "Second name",
+                "type": "password",
+                "label": "Password",
                 "defaultValue": "",
-                "required": false,
-                "displayed": true
+                "required": true,
+                "displayed": false
             },
             {
-                "name": "photo",
+                "name": "roles",
                 "sort": 1,
-                "type": "collection",
-                "collection": "photos",
-                "many": false,
-                "label": "Photo",
-                "defaultValue": "",
-                "required": false,
-                "displayed": true
-            },
-            {
-                "name": "posts",
-                "sort": 1,
-                "type": "collection",
-                "label": "Posts",
+                "type": "collectionMany",
+                "label": "Roles",
                 "defaultValue": "",
                 "required": false,
                 "displayed": true,
-                "collection": "posts",
-                "many": true
+                "collection": "role"
             }
         ],
-        "sort": "second_name",
+        "sort": null,
         "sortType": "-1"
     },
     {
-        "name": "posts",
+        "name": "post",
         "fields": [
             {
                 "name": "title",
-                "label": "Title",
+                "sort": 1,
                 "type": "text",
+                "label": "Title",
+                "defaultValue": "",
                 "required": true,
                 "displayed": true
             },
             {
                 "name": "content",
+                "sort": 1,
+                "type": "wysiwyg",
                 "label": "Content",
-                "type": "wysiwyg"
+                "defaultValue": "",
+                "required": false,
+                "displayed": false
             },
             {
-                "name": "users",
-                "label": "Users",
-                "type": "collection",
-                "collection": "users",
-                "many": true
-            }
-        ],
-        "sort": null,
-        "sortType": "-1"
-    },
-    {
-        "name": "test4",
-        "fields": [
-            {
-                "name": "test_column",
+                "name": "published",
                 "sort": 1,
-                "type": "text",
-                "label": "",
+                "type": "boolean",
+                "label": "Published state",
                 "defaultValue": "",
                 "required": false,
                 "displayed": true
             },
             {
-                "name": "posts",
+                "name": "user",
                 "sort": 1,
-                "type": "collection",
-                "label": "Posts",
+                "type": "collectionOne",
+                "label": "User",
                 "defaultValue": "",
                 "required": false,
                 "displayed": true,
-                "collection": "posts",
-                "many": true
+                "collection": "user"
+            },
+            {
+                "name": "tags",
+                "sort": 1,
+                "type": "collectionMany",
+                "label": "Tags",
+                "defaultValue": "",
+                "required": false,
+                "displayed": false,
+                "collection": "tag"
             }
         ],
         "sort": null,
         "sortType": "-1"
     },
     {
-        "name": "test",
+        "name": "tag",
         "fields": [
-            {
-                "name": "test",
-                "sort": 1,
-                "type": "text",
-                "label": "",
-                "defaultValue": "",
-                "required": false,
-                "displayed": true
-            }
-        ],
-        "sort": "test"
-    },
-    {
-        "name": "test124",
-        "fields": [
-            {
-                "name": "test123",
-                "sort": 1,
-                "type": "text",
-                "label": "",
-                "defaultValue": "",
-                "required": false,
-                "displayed": true
-            }
-        ],
-        "sort": null
-    },
-    {
-        "name": "new_collection",
-        "fields": [
-            {
-                "name": "test",
-                "sort": 1,
-                "type": "text",
-                "label": "",
-                "defaultValue": "",
-                "required": false,
-                "displayed": true
-            }
-        ],
-        "sort": "test"
-    },
-    {
-        "name": "number_col",
-        "fields": [
-            {
-                "name": "number_col",
-                "sort": 1,
-                "type": "number",
-                "label": "Number",
-                "defaultValue": "",
-                "required": true,
-                "displayed": true
-            }
-        ],
-        "sort": "number_col",
-        "sortType": "1"
-    },
-    {
-        "name": "photos",
-        "fields": [
-            {
-                "name": "url",
-                "sort": 1,
-                "type": "media",
-                "label": "",
-                "defaultValue": "",
-                "required": true,
-                "displayed": true
-            },
             {
                 "name": "name",
                 "sort": 1,
                 "type": "text",
-                "label": "",
+                "label": "Name",
                 "defaultValue": "",
-                "required": false,
-                "displayed": false
+                "required": true,
+                "displayed": true
+            }
+        ],
+        "sort": null,
+        "sortType": "-1"
+    },
+    {
+        "name": "role",
+        "fields": [
+            {
+                "name": "name",
+                "sort": 1,
+                "type": "text",
+                "label": "Name",
+                "defaultValue": "",
+                "required": true,
+                "displayed": true
             }
         ],
         "sort": null,

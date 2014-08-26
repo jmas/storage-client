@@ -6,7 +6,7 @@ require 'vendor/autoload.php';
 
 require_once('./Storage.php');
 
-$connection = new PDO('mysql:dbname=collectiontest;host=127.0.0.1', 'root', 'root');
+$connection = new PDO('mysql:dbname=orm;host=127.0.0.1', 'root', 'root');
 
 $schema = json_decode(file_get_contents('./data/schema.json'), true);
 // var_dump($schema); die;
@@ -48,17 +48,21 @@ $app->put('/collection', function () use ($app) {
 $app->post('/collections/:name', function ($name) use ($app) {
   $data = json_decode($app->request->getBody(), true);
 
+  // var_dump($data);
+
   // $name = $data['_name'];
 
-  $schema = $app->storage->getCollectionSchema($name);
+  // $schema = $app->storage->getCollectionSchema($name);
   
-  if ($app->storage->setCollectionSchema($name, $data)) {
-    $name = $data['name'];
-    $data = $app->storage->getSchema();
+  if ($app->storage->updateCollectionSchema($name, $data)) {
+    // $name = $data['name'];
+    $schema = $app->storage->getSchema();
 
-    file_put_contents('./data/schema.json', json_encode($data, JSON_PRETTY_PRINT));
+    file_put_contents('./data/schema.json', json_encode($schema, JSON_PRETTY_PRINT));
 
-    $app->response->write(json_encode($app->storage->getCollectionSchema($name)));
+    $collectionScema = $app->storage->getCollectionSchema($data['name']);
+
+    $app->response->write(json_encode($collectionScema));
     return;
   }
 });
@@ -98,7 +102,7 @@ $app->post('/collections/:name/entries', function($name) use ($app) {
 
   $result = $collection->save($data, true);
 
-  $result = $collection->populate(true)->filter(['id'=>$result['id']])->one();
+  // $result = $collection->populate(true)->filter(['id'=>$result['id']])->one();
 
   if ($result !== false) {
     $app->response->write(json_encode($result));
