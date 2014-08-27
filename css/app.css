@@ -125,7 +125,7 @@ textarea:focus {
 }
 
 #breadcrumbs a:after {
-  content: "/ ";
+  content: " / ";
   margin-left: 5px;
   color: silver;
   font-weight: normal;
@@ -251,12 +251,24 @@ textarea:focus {
 }
 
 #collection-setup .collection-name {
+  position: relative;
   margin-bottom: 30px;
 }
 
-#collection-setup .collection-name input {
+#collection-setup .collection-name-input {
   width: 98%;
   padding: 7px 1%;
+}
+
+#collection-setup .collection-label-input {
+  width: 180px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 8px 0;
+  border: none;
+  background: transparent;
+  color: gray;
 }
 
 .collection-field-list {
@@ -741,4 +753,25 @@ textarea:focus {
 
 .field-entries .item {
   margin-bottom: 0;
+}
+
+.ta-scroll-window.form-control {
+  padding: 10px;
+}
+
+.ta-scroll-window .ta-bind {
+  padding: 0;
+}
+
+.ta-scroll-window .ng-isolate-scope p {
+  margin-bottom: .7em;
+}
+
+.ta-scroll-window .ng-isolate-scope h1,
+.ta-scroll-window .ng-isolate-scope h2,
+.ta-scroll-window .ng-isolate-scope h3,
+.ta-scroll-window .ng-isolate-scope h4,
+.ta-scroll-window .ng-isolate-scope h5,
+.ta-scroll-window .ng-isolate-scope h6 {
+  margin-bottom: .7em;
 }

@@ -11,7 +11,7 @@
       <div class="field-item" ng-repeat="field in collection.fields" ng-if="field.displayed">
         <span class="field-label" ng-class="{required: field.required}">{{field.label || field.name}}</span>
         <span class="field-value" ng-if="! field.collection" ng-bind-html="pretifyValue(item[field.name], field)"></span>
-        <span class="field-value" ng-if="field.collection && item[field.name] && item[field.name] != 0"><a href="#">Preview</a></span>
+        <span class="field-value" ng-if="field.collection && item[field.name] && item[field.name] != 0"><a ng-click="viewEntries(field.collection, item[field.name], field)">Preview</a></span>
         <span class="field-value" ng-if="field.collection && (! item[field.name] || item[field.name] == 0)"></span>
       </div>
     </div>

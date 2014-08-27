@@ -40,8 +40,9 @@
                 "collection": "role"
             }
         ],
-        "sort": null,
-        "sortType": "-1"
+        "sort": "name",
+        "sortType": "1",
+        "label": "Users"
     },
     {
         "name": "post",
@@ -68,7 +69,7 @@
                 "name": "published",
                 "sort": 1,
                 "type": "boolean",
-                "label": "Published state",
+                "label": "Published",
                 "defaultValue": "",
                 "required": false,
                 "displayed": true
@@ -79,7 +80,7 @@
                 "type": "collectionOne",
                 "label": "User",
                 "defaultValue": "",
-                "required": false,
+                "required": true,
                 "displayed": true,
                 "collection": "user"
             },
@@ -95,7 +96,8 @@
             }
         ],
         "sort": null,
-        "sortType": "-1"
+        "sortType": "-1",
+        "label": "Blog posts"
     },
     {
         "name": "tag",
@@ -111,7 +113,8 @@
             }
         ],
         "sort": null,
-        "sortType": "-1"
+        "sortType": "-1",
+        "label": "Tags"
     },
     {
         "name": "role",
@@ -127,6 +130,7 @@
             }
         ],
         "sort": null,
-        "sortType": "-1"
+        "sortType": "-1",
+        "label": "User roles"
     }
 ]

@@ -82,7 +82,15 @@ $app->get('/collections/:name/entries', function($name) use ($app) {
     $collection->sort([ $schema['sort'] => $sortType ]);
   }
 
-  $entries = $collection->populate(true)->all();
+  $entries = $collection->populate(true);
+
+  $ids = $app->request->get('ids');
+
+  if ($ids) {
+    $entries->filter([ 'id' => $ids ]);
+  }
+
+  $entries = $entries->all();
 
   $app->response->write(json_encode($entries));
 });

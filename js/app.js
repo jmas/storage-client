@@ -12,7 +12,7 @@ var app = a.module('app', [
 
 app.config(function($routeProvider, $locationProvider, cfpLoadingBarProvider) {
   cfpLoadingBarProvider.includeSpinner = false;
-  
+
   $locationProvider.html5Mode(false);
 
   $routeProvider.
@@ -70,6 +70,54 @@ app.directive('entryBrowserDialog', function(CollectionService) {
       $scope.shown = false;
       $scope.title = '';
 
+      $scope.closeDialog = function()
+      {
+        $scope.shown = false;
+      };
+
+      $scope.pretifyValue = function(val, field)
+      {
+        switch (field.type) {
+          case 'media':
+            if (val.match(/(jpg|jpeg|png|gif)$/)) {
+              val = '<a href="' + val + '" target="_blank"><img src="' + val + '" /> ' + val + '</a>';
+            }
+            break;
+          case 'boolean':
+            if (val == '1') {
+              val = 'YES';
+            } else {
+              val = 'NO';
+            }
+            break;
+        }
+
+        return val;
+      };
+
+      $rootScope.$on('entryBrowser:view', function(event, collectionName, entries) {
+        var collection = CollectionService.getByName(collectionName);
+
+        $scope.shown = true;
+        $scope.title = 'View Entries';
+        $scope.controls = false;
+        $scope.collection = {
+          name: collection.name,
+          entries: entries,
+          fields: collection.fields
+        };
+
+        $scope.activeItems = [];
+
+        $scope.toggleActiveItem = function(item) { };
+
+        var ids = [];
+
+        // $http({method: 'GET', url: baseUrl + '/collections/' + collection.name + '/entries', data: { ids: ids }}).success(function(result) {
+        //   // self.setEntries(collectionName, result);
+        // });
+      });
+
       $rootScope.$on('entryBrowser:choose', function(event, collection, entry, fieldName) {
 
         var field = CollectionService.getField(collection.name, fieldName);
@@ -78,6 +126,7 @@ app.directive('entryBrowserDialog', function(CollectionService) {
 
         $scope.shown = true;
         $scope.title = 'Choose Entry';
+        $scope.controls = true;
         $scope.collection = collection;
         $scope.activeItems = [];
 
@@ -92,19 +141,6 @@ app.directive('entryBrowserDialog', function(CollectionService) {
         } else {
           entry[fieldName] = null;
         }
-
-        $scope.pretifyValue = function(val, field)
-        {
-          switch (field.type) {
-            case 'media':
-              if (val.match(/(jpg|jpeg|png|gif)$/)) {
-                val = '<a href="' + val + '" target="_blank"><img src="' + val + '" /> ' + val + '</a>';
-              }
-              break;
-          }
-
-          return val;
-        };
 
         $scope.toggleActiveItem = function(item)
         {
@@ -123,11 +159,6 @@ app.directive('entryBrowserDialog', function(CollectionService) {
         $scope.isItemActive = function(item)
         {
           return ! ($scope.activeItems.indexOf(item.id) === -1);
-        };
-
-        $scope.closeDialog = function()
-        {
-          $scope.shown = false;
         };
 
         $scope.choose = function()
@@ -480,7 +511,7 @@ app.controller('EntryEditCtrl', function($scope, $rootScope, $routeParams, $loca
 
   $scope.save = function(redirect)
   {
-    CollectionService.saveEntry($scope.collection.name, $scope.entry.id).success(function(data) {
+    return CollectionService.saveEntry($scope.collection.name, $scope.entry.id).success(function(data) {
       if (typeof data.error == 'undefined') {
         flash('success', 'Saved successfully!');
       }
@@ -498,8 +529,9 @@ app.controller('EntryEditCtrl', function($scope, $rootScope, $routeParams, $loca
 
   $scope.saveAndClose = function()
   {
-    $location.path('collections/' + $scope.collection.name + '/entries');
-    $scope.save(false);
+    $scope.save(false).then(function() {
+      $location.path('collections/' + $scope.collection.name + '/entries');
+    });
   };
 
   $scope.pretifyValue = function(val, field)
@@ -508,6 +540,13 @@ app.controller('EntryEditCtrl', function($scope, $rootScope, $routeParams, $loca
       case 'media':
         if (val.match(/(jpg|jpeg|png|gif)$/)) {
           val = '<a href="' + val + '" target="_blank"><img src="' + val + '" /> ' + val + '</a>';
+        }
+        break;
+      case 'boolean':
+        if (val == '1') {
+          val = 'YES';
+        } else {
+          val = 'NO';
         }
         break;
     }
@@ -525,11 +564,11 @@ app.controller('EntryEditCtrl', function($scope, $rootScope, $routeParams, $loca
     name: 'Collections'
   }, {
     path: 'collections/' + $scope.collection.name + '/entries',
-    name: 'Collection' + ' ' + $scope.collection.name + ' ' + 'entries'
+    name: 'Collection' + ' ' + ($scope.collection.label || $scope.collection.name) + ' ' + 'entries'
   }, $scope.entry.id ? 'Edit entry': 'Create entry']);
 });
 
-app.controller('EntriesListCtrl', function($scope, $routeParams, $location, AppService, CollectionService) {
+app.controller('EntriesListCtrl', function($scope, $routeParams, $location, $rootScope, AppService, CollectionService) {
   var collectionName = $routeParams.collectionName;
 
   CollectionService.loadEntries(collectionName);
@@ -609,15 +648,29 @@ app.controller('EntriesListCtrl', function($scope, $routeParams, $location, AppS
           val = '<a href="' + val + '" target="_blank"><img src="' + val + '" /> ' + val + '</a>';
         }
         break;
+      case 'boolean':
+        if (val == '1') {
+          val = 'YES';
+        } else {
+          val = 'NO';
+        }
+        break;
     }
 
     return val;
   };
 
+  $scope.viewEntries = function(collectionName, entries, field)
+  {
+    entries = (field.type == 'collectionMany' ? entries: [entries]);
+
+    $rootScope.$emit('entryBrowser:view', collectionName, entries);
+  };
+
   AppService.setBreadcrumbs([{
     path: 'collections',
     name: 'Collections'
-  }, 'Collection' + ' ' + $scope.collection.name + ' ' + 'entries' ]);
+  }, 'Collection' + ' ' + ($scope.collection.label || $scope.collection.name) + ' ' + 'entries' ]);
 });
 
 app.controller('CollectionsListCtrl', function($scope, AppService, CollectionService) {
@@ -636,10 +689,12 @@ app.controller('CollectionEditCtrl', function($scope, $routeParams, $location, A
   $scope.collectionName = collectionName;
   $scope.collection = CollectionService.getByName(collectionName);
   $scope.collections = CollectionService.all();
+  $scope.isLabelEmpty = false;
   
   if (! $scope.collection) {
     CollectionService.add({
       name: null,
+      label: null,
       fields: [
         {
           name: '',
@@ -656,7 +711,22 @@ app.controller('CollectionEditCtrl', function($scope, $routeParams, $location, A
     $scope.collection = CollectionService.getByName(null);
   }
 
+  if (! $scope.collection.label) {
+    $scope.isLabelEmpty = true;
+  }
+
   $scope.activeFieldIndex = null;
+
+  $scope.updateLabel = function()
+  {
+    if ($scope.isLabelEmpty) {
+      if ($scope.collection.name.length > 0) {
+        $scope.collection.label = $scope.collection.name[0].toString().toUpperCase() + $scope.collection.name.substr(1);
+      } else {
+        $scope.collection.label = '';
+      }
+    }
+  };
 
   $scope.toggleField = function(index)
   {
@@ -687,7 +757,7 @@ app.controller('CollectionEditCtrl', function($scope, $routeParams, $location, A
 
   $scope.save = function(redirect)
   {
-    CollectionService.save($scope.collection.name)
+    return CollectionService.save($scope.collection.name)
       .then(function(data) {
         flash('success', 'Saved successfully!');
 
@@ -699,14 +769,15 @@ app.controller('CollectionEditCtrl', function($scope, $routeParams, $location, A
 
   $scope.saveAndClose = function()
   {
-    $location.path('collections');
-    $scope.save(false);
+    $scope.save(false).then(function() {
+      $location.path('collections');
+    });
   };
 
   AppService.setBreadcrumbs([{
     path: 'collections',
     name: 'Collections'
-  }, $scope.collection.name ? 'Edit collection' + ' ' + $scope.collection.name: 'Create collection' ]);
+  }, $scope.collection.name ? 'Edit collection' + ' ' + ($scope.collection.label || $scope.collection.name): 'Create collection' ]);
 });
 
 })(angular);

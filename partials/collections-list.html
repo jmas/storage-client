@@ -6,7 +6,7 @@
   </div>
   <div ng-repeat="item in collections" class="collection-list" ng-if="item.name">
     <div class="item">
-      <div class="name"><a href="#collections/{{item.name}}/entries">{{item.name}}</a></div>
+      <div class="name"><a href="#collections/{{item.name}}/entries">{{item.label || item.name}}</a></div>
       <div class="options">
         <a href="#collections/{{item.name}}/edit"><img src="images/setup.png" /></a>
         <a ng-click="removeCollection(item.name)"><img src="images/remove.png" /></a>

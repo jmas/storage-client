@@ -1,6 +1,7 @@
 <div id="collection-setup">
   <div class="collection-name">
-    <input type="text" placeholder="Collection name" ng-model="collection.name" />
+    <input type="text" class="collection-name-input" ng-model="collection.name" placeholder="Collection name" ng-change="updateLabel()" />
+    <input type="text" class="collection-label-input" ng-model="collection.label" placeholder="Label" />
   </div>
 
   <div id="sidebar">
