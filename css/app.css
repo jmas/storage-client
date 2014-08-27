@@ -215,6 +215,12 @@ textarea:focus {
   color: silver;
 }
 
+.collection-list .real-name {
+  color: silver;
+  font-style: italic;
+  margin-left: 5px;
+}
+
 .collection-list img {
   vertical-align: middle;
 }

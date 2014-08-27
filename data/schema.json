@@ -97,7 +97,7 @@
         ],
         "sort": null,
         "sortType": "-1",
-        "label": "Blog posts"
+        "label": "Blog Posts"
     },
     {
         "name": "tag",
@@ -131,6 +131,6 @@
         ],
         "sort": null,
         "sortType": "-1",
-        "label": "User roles"
+        "label": "User Roles"
     }
 ]
