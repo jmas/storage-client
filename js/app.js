@@ -119,7 +119,6 @@ app.directive('entryBrowserDialog', function(CollectionService) {
       });
 
       $rootScope.$on('entryBrowser:choose', function(event, collection, entry, fieldName) {
-
         var field = CollectionService.getField(collection.name, fieldName);
         var collection = CollectionService.getByName(field.collection);
         var many = (field.type == 'collectionMany' ? true: false);
@@ -488,6 +487,20 @@ app.factory("CollectionService", function($http) {
             self.setEntry(collectionName, result);
           }
         });
+    },
+    saveOrder: function()
+    {
+      var collections = [];
+
+      for (var i=0,len=data.collections.length; i<len; i++) {
+        collections.push(data.collections[i].name);
+      }
+
+      return $http({method: 'POST', data: collections, url: baseUrl + '/collections'})
+        .success(function(result) {
+          if (typeof data.error == 'undefined') {
+          }
+        });
     }
   };
 });
@@ -564,8 +577,8 @@ app.controller('EntryEditCtrl', function($scope, $rootScope, $routeParams, $loca
     name: 'Collections'
   }, {
     path: 'collections/' + $scope.collection.name + '/entries',
-    name: 'Collection' + ' ' + ($scope.collection.label || $scope.collection.name) + ' ' + 'entries'
-  }, $scope.entry.id ? 'Edit entry': 'Create entry']);
+    name: 'Entries of' + ' ' + ($scope.collection.label || $scope.collection.name)
+  }, $scope.entry.id ? 'Editing': 'Creating']);
 });
 
 app.controller('EntriesListCtrl', function($scope, $routeParams, $location, $rootScope, AppService, CollectionService) {
@@ -670,13 +683,17 @@ app.controller('EntriesListCtrl', function($scope, $routeParams, $location, $roo
   AppService.setBreadcrumbs([{
     path: 'collections',
     name: 'Collections'
-  }, 'Collection' + ' ' + ($scope.collection.label || $scope.collection.name) + ' ' + 'entries' ]);
+  }, 'Entries of' + ' ' + ($scope.collection.label || $scope.collection.name) ]);
 });
 
 app.controller('CollectionsListCtrl', function($scope, AppService, CollectionService) {
   AppService.setBreadcrumbs(['Collections']);
 
   $scope.collections = CollectionService.all();
+
+  $scope.$on('ngrr-reordered', function() {
+    CollectionService.saveOrder();
+  });
 
   $scope.removeCollection = function(collectionName) {
     CollectionService.removeCollection(collectionName);
@@ -777,7 +794,7 @@ app.controller('CollectionEditCtrl', function($scope, $routeParams, $location, A
   AppService.setBreadcrumbs([{
     path: 'collections',
     name: 'Collections'
-  }, $scope.collection.name ? 'Edit collection' + ' ' + ($scope.collection.label || $scope.collection.name): 'Create collection' ]);
+  }, $scope.collection.name ? 'Editing ' + ' ' + ($scope.collection.label || $scope.collection.name): 'Creating' ]);
 });
 
 })(angular);

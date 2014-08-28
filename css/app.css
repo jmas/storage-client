@@ -199,6 +199,10 @@ textarea:focus {
   margin-right: 5px;
 }
 
+.collection-list {
+  position: relative;
+}
+
 .collection-list .item {
   position: relative;
   border: 1px solid #eee;
@@ -277,6 +281,10 @@ textarea:focus {
   color: gray;
 }
 
+#collection-setup .collection-label-input:focus {
+  color: #000;
+}
+
 .collection-field-list {
   position: relative;
 }
@@ -316,7 +324,6 @@ textarea:focus {
 .collection-field-list .name {
   padding: 15px;
 }
-
 
 .collection-field-list .name input {
   border-style: dotted;
@@ -546,7 +553,7 @@ textarea:focus {
   left: 5px;
   width: 20px;
   height: 16px;
-  background-image: url(https://dl.dropboxusercontent.com/u/16874200/sort14.png);
+  background-image: url(../images/sort.png);
   background-repeat: no-repeat;
   background-position: center;
   cursor: move;

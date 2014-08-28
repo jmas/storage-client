@@ -4,8 +4,8 @@
     <!-- <a href="#" class="btn">Select All</a> -->
     <!-- <a href="#" class="btn danger">Remove Selected</a> -->
   </div>
-  <div ng-repeat="item in collections" class="collection-list" ng-if="item.name">
-    <div class="item">
+  <div class="collection-list">
+    <div class="item" ng-repeat-reorder="item in collections" ng-repeat-reorder-handle>
       <div class="name">
         <a href="#collections/{{item.name}}/entries">{{item.label || item.name}}</a>
         <span class="real-name" ng-if="item.label">{{item.name}}</span>

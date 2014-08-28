@@ -23,7 +23,7 @@
     </select>
   </div>
   <div ng-switch-when="boolean">
-    <input type="checkbox" ng-model="entry[name]" />
+    <input type="checkbox" ng-model="entry[name]" ng-checked="entry[name] === '1'" />
   </div>
   <div ng-switch-when="wysiwyg">
     <text-angular ng-model="entry[name]"></text-angular>

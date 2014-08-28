@@ -9,9 +9,9 @@
   <div class="item" ng-repeat="item in collection.entries" ng-if="item.id" ng-class="{active: isSelectedEntry($index)}" ng-click="selectEntry($index)">
     <div class="field-list">
       <div class="field-item" ng-repeat="field in collection.fields" ng-if="field.displayed">
-        <span class="field-label" ng-class="{required: field.required}">{{field.label || field.name}}</span>
+        <span class="field-label" ng-class="{required: field.required}"><acronym title="{{field.name}}">{{field.label || field.name}}</acronym></span>
         <span class="field-value" ng-if="! field.collection" ng-bind-html="pretifyValue(item[field.name], field)"></span>
-        <span class="field-value" ng-if="field.collection && item[field.name] && item[field.name] != 0"><a ng-click="viewEntries(field.collection, item[field.name], field)">Preview</a></span>
+        <span class="field-value" ng-if="field.collection && item[field.name] && item[field.name] != 0"><a ng-click="viewEntries(field.collection, item[field.name], field)">View</a></span>
         <span class="field-value" ng-if="field.collection && (! item[field.name] || item[field.name] == 0)"></span>
       </div>
     </div>

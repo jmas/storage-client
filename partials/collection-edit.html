@@ -7,7 +7,7 @@
   <div id="sidebar">
     <div id="fields-sorter" class="field-sorter-list">
       <div class="item" ng-repeat-reorder="item in collection.fields" ng-repeat-reorder-handle="i">
-        <i class="move test"></i>
+        <i class="move"></i>
         <span class="name">{{item.name}}</span>
         <span class="select"><input type="checkbox" ng-model="item.displayed" /></span>
       </div>
@@ -75,7 +75,7 @@
                 <label>Collection</label>
                 <span class="field">
                   <select ng-model="item.collection">
-                    <option value="{{collectionItem.name}}" ng-repeat="collectionItem in collections" ng-selected="item.collection == collectionItem.name">{{collectionItem.name}}</option>
+                    <option value="{{collectionItem.name}}" ng-repeat="collectionItem in collections" ng-selected="item.collection == collectionItem.name">{{collectionItem.label || collectionItem.name}}</option>
                   </select>
                 </span>
               </div>

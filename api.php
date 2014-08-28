@@ -1,16 +1,8 @@
 <?php
 
-// $start_time = microtime(TRUE);
-
-require 'vendor/autoload.php';
-
+require_once('vendor/autoload.php');
 require_once('./Storage.php');
-
-$connection = new PDO('mysql:dbname=orm;host=127.0.0.1', 'root', 'root');
-
-$schema = json_decode(file_get_contents('./data/schema.json'), true);
-// var_dump($schema); die;
-$storage = new Storage($connection, $schema);
+require_once('./HttpBasicAuth.php');
 
 // $results = $storage->posts
 //               ->filter(['id'=>[1, 2]])
@@ -26,36 +18,68 @@ $storage = new Storage($connection, $schema);
 
 // $results = $storage->posts->populate(['users'])->all();
 
-$app = new \Slim\Slim([
-    'debug' => true,
-    'mode' => 'development',
-]);
+// init slim application
+$app = new \Slim\Slim(
+  file_exists('./config.local.php') ? require_once('./config.local.php'): require_once('./config.php')
+);
 
+// get access to storage
+$connection = new PDO($app->config('pdo.dsn'), $app->config('pdo.username'), $app->config('pdo.password'));
+$schema = json_decode(file_get_contents('./data/schema.json'), true);
+$storage = new Storage($connection, $schema);
 $app->storage = $storage;
 
+// auth
+$app->add(new \Slim\Extras\Middleware\HttpBasicAuth(function($username, $password) use ($app) {
+  $isUserExists = $app->storage->collection($app->config('auth.collectionName'))->filter([
+    $app->config('auth.usernameField')=>$username,
+    $app->config('auth.passwordField')=>$password,
+  ])->exists();
+
+  if ($isUserExists) {
+    return true;
+  } else if ($app->config('auth.allowMaster')
+    && $username === $app->config('auth.masterUsername')
+    && $password === $app->config('auth.masterPassword')) {
+    return true;
+  }
+
+  return false;
+}));
+
+// set json http header
 $app->response->headers->set('Content-Type', 'application/json');
 
+// get all collections
 $app->get('/collections', function() use ($app) {
   $schema = $app->storage->getSchema();
-// die('test');
   $app->response->write(json_encode($schema));
 });
 
-$app->put('/collection', function () use ($app) {
-  // create new
-});
-
-$app->post('/collections/:name', function ($name) use ($app) {
+// update collections order
+$app->post('/collections', function() use ($app) {
   $data = json_decode($app->request->getBody(), true);
 
-  // var_dump($data);
+  $schema = $app->storage->getSchema();
 
-  // $name = $data['_name'];
+  $reorderedSchema = [];
 
-  // $schema = $app->storage->getCollectionSchema($name);
+  foreach ($data as $name) {
+    foreach ($schema as $collectionSchema) {
+      if ($collectionSchema['name'] == $name) {
+        $reorderedSchema[] = $collectionSchema;
+      }
+    }
+  }
   
+  file_put_contents('./data/schema.json', json_encode($reorderedSchema, JSON_PRETTY_PRINT));
+});
+
+// update collecion schema
+$app->post('/collections/:name', function ($name) use ($app) {
+  $data = json_decode($app->request->getBody(), true);
+ 
   if ($app->storage->updateCollectionSchema($name, $data)) {
-    // $name = $data['name'];
     $schema = $app->storage->getSchema();
 
     file_put_contents('./data/schema.json', json_encode($schema, JSON_PRETTY_PRINT));
@@ -67,10 +91,12 @@ $app->post('/collections/:name', function ($name) use ($app) {
   }
 });
 
+// delete collection
 $app->delete('/collections/:name', function() use ($app) {
 
 });
 
+// get collection entries
 $app->get('/collections/:name/entries', function($name) use ($app) {
   $collection = $app->storage->{$name};
 
@@ -95,10 +121,7 @@ $app->get('/collections/:name/entries', function($name) use ($app) {
   $app->response->write(json_encode($entries));
 });
 
-// $app->get('/test', function() use ($app) {
-//   $app->response->write(json_encode($app->storage->users1->all()));
-// });
-
+// update collection entries
 $app->post('/collections/:name/entries', function($name) use ($app) {
   $collection = $app->storage->collection($name);
 
@@ -110,16 +133,21 @@ $app->post('/collections/:name/entries', function($name) use ($app) {
 
   $result = $collection->save($data, true);
 
-  // $result = $collection->populate(true)->filter(['id'=>$result['id']])->one();
-
   if ($result !== false) {
     $app->response->write(json_encode($result));
   }
 });
 
-$app->get('/test', function() use ($app) {
-  $app->response->write(json_encode($app->storage->collection('users')->populate(['photo'])->all()));
+// delete collection entries
+$app->delete('/collections/:name/entries', function() use ($app) {
+
 });
 
+// test
+$app->get('/test', function() use ($app) {
+  $result = $app->storage->collection('post')->filter(['published'=>false])->all();
+
+  $app->response->write(json_encode($result));
+});
 
 $app->run();

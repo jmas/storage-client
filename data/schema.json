@@ -1,5 +1,106 @@
 [
     {
+        "name": "post",
+        "fields": [
+            {
+                "name": "title",
+                "sort": 1,
+                "type": "text",
+                "label": "Title",
+                "defaultValue": "",
+                "required": true,
+                "displayed": true
+            },
+            {
+                "name": "published",
+                "sort": 1,
+                "type": "boolean",
+                "label": "Published",
+                "defaultValue": "",
+                "required": true,
+                "displayed": true
+            },
+            {
+                "name": "content",
+                "sort": 1,
+                "type": "wysiwyg",
+                "label": "Content",
+                "defaultValue": "",
+                "required": false,
+                "displayed": false
+            },
+            {
+                "name": "tags",
+                "sort": 1,
+                "type": "collectionMany",
+                "label": "Tags",
+                "defaultValue": "",
+                "required": false,
+                "displayed": false,
+                "collection": "tag"
+            },
+            {
+                "name": "user",
+                "sort": 1,
+                "type": "collectionOne",
+                "label": "User",
+                "defaultValue": "",
+                "required": true,
+                "displayed": false,
+                "collection": "user"
+            },
+            {
+                "name": "photos",
+                "sort": 1,
+                "type": "collectionMany",
+                "label": "Photos",
+                "defaultValue": "",
+                "required": false,
+                "displayed": false,
+                "collection": "photos"
+            },
+            {
+                "name": "prosucts",
+                "sort": 1,
+                "type": "collectionMany",
+                "label": "Products",
+                "defaultValue": "",
+                "required": false,
+                "displayed": true,
+                "collection": "product"
+            }
+        ],
+        "sort": null,
+        "sortType": "-1",
+        "label": "Blog Posts"
+    },
+    {
+        "name": "photos",
+        "label": "Posts Photos",
+        "fields": [
+            {
+                "name": "name",
+                "sort": 1,
+                "type": "text",
+                "label": "Name",
+                "defaultValue": "",
+                "required": false,
+                "displayed": true
+            },
+            {
+                "name": "url",
+                "sort": 1,
+                "type": "media",
+                "label": "Image URL",
+                "defaultValue": "",
+                "required": true,
+                "displayed": true
+            }
+        ],
+        "sort": null,
+        "sortType": "-1"
+    },
+    {
         "name": "user",
         "fields": [
             {
@@ -45,59 +146,21 @@
         "label": "Users"
     },
     {
-        "name": "post",
+        "name": "role",
         "fields": [
             {
-                "name": "title",
+                "name": "name",
                 "sort": 1,
                 "type": "text",
-                "label": "Title",
+                "label": "Name",
                 "defaultValue": "",
                 "required": true,
                 "displayed": true
-            },
-            {
-                "name": "content",
-                "sort": 1,
-                "type": "wysiwyg",
-                "label": "Content",
-                "defaultValue": "",
-                "required": false,
-                "displayed": false
-            },
-            {
-                "name": "published",
-                "sort": 1,
-                "type": "boolean",
-                "label": "Published",
-                "defaultValue": "",
-                "required": false,
-                "displayed": true
-            },
-            {
-                "name": "user",
-                "sort": 1,
-                "type": "collectionOne",
-                "label": "User",
-                "defaultValue": "",
-                "required": true,
-                "displayed": true,
-                "collection": "user"
-            },
-            {
-                "name": "tags",
-                "sort": 1,
-                "type": "collectionMany",
-                "label": "Tags",
-                "defaultValue": "",
-                "required": false,
-                "displayed": false,
-                "collection": "tag"
             }
         ],
         "sort": null,
         "sortType": "-1",
-        "label": "Blog Posts"
+        "label": "User Roles"
     },
     {
         "name": "tag",
@@ -117,7 +180,8 @@
         "label": "Tags"
     },
     {
-        "name": "role",
+        "name": "product",
+        "label": "Product",
         "fields": [
             {
                 "name": "name",
@@ -125,12 +189,21 @@
                 "type": "text",
                 "label": "Name",
                 "defaultValue": "",
-                "required": true,
+                "required": false,
                 "displayed": true
+            },
+            {
+                "name": "posts",
+                "sort": 1,
+                "type": "collectionMany",
+                "label": "Posts",
+                "defaultValue": "",
+                "required": false,
+                "displayed": true,
+                "collection": "post"
             }
         ],
         "sort": null,
-        "sortType": "-1",
-        "label": "User Roles"
+        "sortType": "-1"
     }
 ]
