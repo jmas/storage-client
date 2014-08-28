@@ -4,20 +4,6 @@ require_once('vendor/autoload.php');
 require_once('./Storage.php');
 require_once('./HttpBasicAuth.php');
 
-// $results = $storage->posts
-//               ->filter(['id'=>[1, 2]])
-//               ->sort(['title'=>-1])
-//               ->populate(['users'=>['name']])
-//               ->all(); // ['id', 'user']
-
-// $storage->posts->save([
-// //  'id'=>1,
-//   'title'=>'Good morning',
-//   'user'=>2,
-// ]);
-
-// $results = $storage->posts->populate(['users'])->all();
-
 // init slim application
 $app = new \Slim\Slim(
   file_exists('./config.local.php') ? require_once('./config.local.php'): require_once('./config.php')
@@ -139,13 +125,19 @@ $app->post('/collections/:name/entries', function($name) use ($app) {
 });
 
 // delete collection entries
-$app->delete('/collections/:name/entries', function() use ($app) {
+$app->delete('/collections/:name/entries', function($name) use ($app) {
+  $data = json_decode($app->request->getBody(), true);
+// var_dump($data);
+  $result = $app->storage->collection($name)->remove($data);
 
+  $app->response->write(json_encode([
+    'result'=>$result,
+  ]));
 });
 
 // test
 $app->get('/test', function() use ($app) {
-  $result = $app->storage->collection('post')->filter(['published'=>false])->all();
+  $result = $app->storage->collection('user')->filter(['id'=>['from'=>2, 'to'=>2]])->all();
 
   $app->response->write(json_encode($result));
 });

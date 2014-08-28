@@ -17,6 +17,8 @@
       <select ng-model="collection.sort" ng-init="collection.sort=(collection.sort ? collection.sort: null)">
         <option value="null">- Sort By -</option>
         <option value="{{field.name}}" ng-repeat="field in collection.fields" ng-selected="collection.sort == field.name">{{field.name}}</option>
+        <option value="createdAt">createdAt</option>
+        <option value="updatedAt">updatedAt</option>
       </select>
 
       <select ng-model="collection.sortType" ng-init="collection.sortType=(collection.sortType ? collection.sortType: '-1')">

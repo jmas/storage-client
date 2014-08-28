@@ -341,7 +341,7 @@ class Storage
     $limit = $this->limit;
     $skip = $this->skip;
 
-    $this->clear();
+    $this->reset();
 
     if (! $collectionName) {
       throw new Exception("Collection name is required.");
@@ -366,7 +366,25 @@ class Storage
       $and = [];
 
       foreach ($filter as $column=>$value) {
-        if (is_array($value)) {
+        if (is_array($value) && $this->isAssocArray($value)) {
+          if (isset($value['from'])) {
+            $placeholder = ':' . $column . '_' . uniqid();
+            $and[] = " {$column} >= {$placeholder} ";
+            $sqlParams[$placeholder] = $value['from'];
+          }
+
+          if (isset($value['to'])) {
+            $placeholder = ':' . $column . '_' . uniqid();
+            $and[] = " {$column} <= {$placeholder} ";
+            $sqlParams[$placeholder] = $value['to'];
+          }
+
+          if (isset($value['like'])) {
+            $placeholder = ':' . $column . '_' . uniqid();
+            $and[] = " {$column} LIKE {$placeholder} ";
+            $sqlParams[$placeholder] = $value['like'];
+          }
+        } else if (is_array($value)) {
           $or = [];
 
           foreach ($value as $orColumn=>$orValue) {
@@ -404,15 +422,21 @@ class Storage
 
     $sth = $this->connection->prepare($sql);
 
+    if (! empty($sqlParams)) {
+      foreach ($sqlParams as $key => $value) {
+        $type = PDO::PARAM_STR;
+
+        if (is_int($value)) {
+          $type = PDO::PARAM_INT;
+        }
+
+        $sth->bindValue($key, $value, $type);
+      }
+    }
+
     try {
-      if (! empty($sqlParams)) {
-        if ($sth->execute($sqlParams) === false) {
-          return null;
-        }
-      } else {
-        if ($sth->execute() === false) {
-          return null;
-        }
+      if ($sth->execute() === false) {
+        return null;
       }
     } catch (PDOException $e) {
       throw new Exception($e->getMessage());
@@ -428,7 +452,7 @@ class Storage
    */
   public function find($collectionName, array $filter, array $sort, array $fields, $populate, $limit, $skip)
   {
-    $this->clear();
+    $this->reset();
 
     if (! $collectionName) {
       throw new Exception("Collection name is required.");
@@ -463,7 +487,25 @@ class Storage
       $and = [];
 
       foreach ($filter as $column=>$value) {
-        if (is_array($value)) {
+        if (is_array($value) && $this->isAssocArray($value)) {
+          if (isset($value['from'])) {
+            $placeholder = ':' . $column . '_' . uniqid();
+            $and[] = " {$column} >= {$placeholder} ";
+            $sqlParams[$placeholder] = $value['from'];
+          }
+
+          if (isset($value['to'])) {
+            $placeholder = ':' . $column . '_' . uniqid();
+            $and[] = " {$column} <= {$placeholder} ";
+            $sqlParams[$placeholder] = $value['to'];
+          }
+
+          if (isset($value['like'])) {
+            $placeholder = ':' . $column . '_' . uniqid();
+            $and[] = " {$column} LIKE {$placeholder} ";
+            $sqlParams[$placeholder] = $value['like'];
+          }
+        } else if (is_array($value)) {
           $or = [];
 
           foreach ($value as $orColumn=>$orValue) {
@@ -501,15 +543,21 @@ class Storage
 
     $sth = $this->connection->prepare($sql);
 
+    if (! empty($sqlParams)) {
+      foreach ($sqlParams as $key => $value) {
+        $type = PDO::PARAM_STR;
+
+        if (is_int($value)) {
+          $type = PDO::PARAM_INT;
+        }
+
+        $sth->bindValue($key, $value, $type);
+      }
+    }
+
     try {
-      if (! empty($sqlParams)) {
-        if ($sth->execute($sqlParams) === false) {
-          return null;
-        }
-      } else {
-        if ($sth->execute() === false) {
-          return null;
-        }
+      if ($sth->execute() === false) {
+        return null;
       }
     } catch (PDOException $e) {
       throw new Exception($e->getMessage());
@@ -773,6 +821,32 @@ class Storage
   /**
    *
    */
+  public function remove(array $ids)
+  {
+    $sqlTable = $this->collectionName;
+
+    $this->reset();
+
+    foreach ($ids as $i => $value) {
+      $ids[$i] = (int) $value;
+    }
+
+    $sqlIds = implode(', ', $ids);
+
+    $sql = "DELETE FROM {$sqlTable} WHERE id IN ($sqlIds)";
+
+    $sth = $this->connection->prepare($sql);
+
+    if ($sth->execute() !== false) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   *
+   */
   private function makeJunctionTableName($firstTableName, $secondTableName)
   {
     $names = [$firstTableName, $secondTableName];
@@ -825,7 +899,10 @@ class Storage
     return $sql;
   }
 
-  private function clear()
+  /**
+   *
+   */
+  private function reset()
   {
     $this->collectionName = null;
     $this->fields = [];
@@ -834,5 +911,19 @@ class Storage
     $this->skip = null;
     $this->filter = [];
     $this->populate = [];
+  }
+
+  /**
+   *
+   */
+  private function isAssocArray($array)
+  {
+    foreach ($array as $a => $b) {
+        if (! is_int($a)) {
+            return true;
+        }
+    }
+
+    return false;
   }
 }

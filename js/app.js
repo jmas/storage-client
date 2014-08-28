@@ -501,6 +501,24 @@ app.factory("CollectionService", function($http) {
           if (typeof data.error == 'undefined') {
           }
         });
+    },
+    removeEntries: function(collectionName, entriesIds)
+    {
+      var collection = this.getByName(collectionName);
+
+      return $http({method: 'DELETE', data: entriesIds, url: baseUrl + '/collections/' + collectionName + '/entries'})
+        .success(function(result) {
+          if (typeof data.error == 'undefined') {
+            for (var i=0,len=entriesIds.length; i<len; i++) {
+              for (var j=0,lenj=collection.entries.length; j<lenj; j++) {
+                if (entriesIds.indexOf(collection.entries[j].id) !== -1) {
+                  collection.entries.splice(j, 1);
+                  break;
+                }
+              }
+            }
+          }
+        });
     }
   };
 });
@@ -581,7 +599,7 @@ app.controller('EntryEditCtrl', function($scope, $rootScope, $routeParams, $loca
   }, $scope.entry.id ? 'Editing': 'Creating']);
 });
 
-app.controller('EntriesListCtrl', function($scope, $routeParams, $location, $rootScope, AppService, CollectionService) {
+app.controller('EntriesListCtrl', function($scope, $routeParams, $location, $rootScope, AppService, CollectionService, flash) {
   var collectionName = $routeParams.collectionName;
 
   CollectionService.loadEntries(collectionName);
@@ -623,7 +641,7 @@ app.controller('EntriesListCtrl', function($scope, $routeParams, $location, $roo
 
     for (var i=0,len=entries.length; i<len; i++) {
       if ($scope.selectedEntries.indexOf(i) == -1) {
-        $scope.selectedEntries.push(i);
+        $scope.selectedEntries.push(entries[i].id);
       }
     }
   };
@@ -678,6 +696,21 @@ app.controller('EntriesListCtrl', function($scope, $routeParams, $location, $roo
     entries = (field.type == 'collectionMany' ? entries: [entries]);
 
     $rootScope.$emit('entryBrowser:view', collectionName, entries);
+  };
+
+  $scope.removeSelected = function()
+  {
+    CollectionService.removeEntries(collectionName, $scope.selectedEntries).then(function() {
+      flash('success', 'Removed successfully!');
+      $scope.selectedEntries.splice(0, $scope.selectedEntries.length);
+    });
+  };
+
+  $scope.remove = function(entryId)
+  {
+    CollectionService.removeEntries(collectionName, [entryId]).then(function() {
+      flash('success', 'Removed successfully!');
+    });
   };
 
   AppService.setBreadcrumbs([{

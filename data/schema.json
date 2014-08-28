@@ -70,7 +70,7 @@
                 "collection": "product"
             }
         ],
-        "sort": null,
+        "sort": "createdAt",
         "sortType": "-1",
         "label": "Blog Posts"
     },

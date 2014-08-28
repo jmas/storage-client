@@ -2,25 +2,35 @@
   <a href="#collections/{{collectionName}}/entries/create" class="btn trusty">Create</a>
   <a class="btn select-all-btn" ng-click="selectAll()" ng-class="{active: !isAllSelected()}">Select All</a>
   <a class="btn deselect-all-btn" ng-click="deselectAll()" ng-class="{active: isSelected()}">Deselect</a>
-  <a href="#" class="btn danger remove-btn" ng-class="{active: isSelected()}">Remove Selected</a>
+  <a class="btn danger remove-btn" ng-click="removeSelected()" ng-class="{active: isSelected()}">Remove Selected</a>
 </div>
 
-<div class="entry-list">
-  <div class="item" ng-repeat="item in collection.entries" ng-if="item.id" ng-class="{active: isSelectedEntry($index)}" ng-click="selectEntry($index)">
-    <div class="field-list">
-      <div class="field-item" ng-repeat="field in collection.fields" ng-if="field.displayed">
-        <span class="field-label" ng-class="{required: field.required}"><acronym title="{{field.name}}">{{field.label || field.name}}</acronym></span>
-        <span class="field-value" ng-if="! field.collection" ng-bind-html="pretifyValue(item[field.name], field)"></span>
-        <span class="field-value" ng-if="field.collection && item[field.name] && item[field.name] != 0"><a ng-click="viewEntries(field.collection, item[field.name], field)">View</a></span>
-        <span class="field-value" ng-if="field.collection && (! item[field.name] || item[field.name] == 0)"></span>
+<div id="sidebar">
+  <div>
+    <input type="text" placeholder="Filter" />
+  </div>
+</div>
+
+<div class="has-sidebar">
+
+  <div class="entry-list">
+    <div class="item" ng-repeat="item in collection.entries" ng-if="item.id" ng-class="{active: isSelectedEntry(item.id)}" ng-click="selectEntry(item.id)">
+      <div class="field-list">
+        <div class="field-item" ng-repeat="field in collection.fields" ng-if="field.displayed">
+          <span class="field-label" ng-class="{required: field.required}"><acronym title="{{field.name}}">{{field.label || field.name}}</acronym></span>
+          <span class="field-value" ng-if="! field.collection" ng-bind-html="pretifyValue(item[field.name], field)"></span>
+          <span class="field-value" ng-if="field.collection && item[field.name] && item[field.name] != 0"><a ng-click="viewEntries(field.collection, item[field.name], field)">View</a></span>
+          <span class="field-value" ng-if="field.collection && (! item[field.name] || item[field.name] == 0)"></span>
+        </div>
+      </div>
+      <div class="modified" ng-if="item.modified">
+        {{toDate(item.modified)}}
+      </div>
+      <div class="options">
+        <a href="#collections/{{collectionName}}/entries/{{item.id}}/edit"><img src="images/edit.png" /></a>
+        <a ng-click="remove(item.id)"><img src="images/remove.png" /></a>
       </div>
     </div>
-    <div class="modified" ng-if="item.modified">
-      {{toDate(item.modified)}}
-    </div>
-    <div class="options">
-      <a href="#collections/{{collectionName}}/entries/{{item.id}}/edit"><img src="images/edit.png" /></a>
-      <a><img src="images/remove.png" /></a>
-    </div>
   </div>
+
 </div>
