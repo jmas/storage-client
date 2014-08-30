@@ -418,6 +418,7 @@ textarea:focus {
 }
 
 .entry-list-options {
+  position: relative;
   margin-bottom: 15px;
 }
 
@@ -432,6 +433,19 @@ textarea:focus {
 .entry-list-options .remove-btn.active {
   display: inline-block;
 }
+
+.option-filter {
+  float: right;
+  width: 190px;
+}
+
+.option-filter input {
+  width: 95%;
+  padding-left: 2%;
+  padding-right: 2%;
+  line-height: 18px;
+}
+
 
 .entry-list .item {
   position:relative;
@@ -787,4 +801,10 @@ textarea:focus {
 .ta-scroll-window .ng-isolate-scope h5,
 .ta-scroll-window .ng-isolate-scope h6 {
   margin-bottom: .7em;
+}
+
+.load-more-trigger {
+  text-align: center;
+  line-height: 60px;
+  font-size: .9em;
 }

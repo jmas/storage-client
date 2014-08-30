@@ -7,7 +7,9 @@ var app = a.module('app', [
   'textAngular',
   'flash',
   'ngRepeatReorder',
-  'angular-loading-bar'
+  'angular-loading-bar',
+  'debounce',
+  'cfp.hotkeys'
 ]);
 
 app.config(function($routeProvider, $locationProvider, cfpLoadingBarProvider) {
@@ -47,6 +49,21 @@ app.config(function($routeProvider, $locationProvider, cfpLoadingBarProvider) {
 
 app.run(function(CollectionService) {
   CollectionService.load();
+});
+
+app.directive('dateFormat', function() {
+  function link(scope, element, attrs) {
+    setTimeout((function(element) {
+      return function() {
+        element[0].innerHTML = moment(element[0].innerHTML).fromNow();
+      }
+    })(element), 0);
+  }
+
+  return {
+    restrict: 'A',
+    link: link
+  };
 });
 
 app.directive('field', function() {
@@ -227,17 +244,28 @@ app.factory("CollectionService", function($http) {
         self.setCollections(result);
       });
     },
-    loadEntries: function(collectionName)
+    loadEntries: function(collectionName, skip, filter)
     {
       var collection = this.getByName(collectionName);
       var self = this;
+      var data = {};
 
-      if (typeof collection.entries != 'undefined') {
+      if (typeof collection.entries != 'undefined' && skip === 0) {
         collection.entries.splice(0, collection.entries.length);
       }
 
-      return $http({method: 'GET', url: baseUrl + '/collections/' + collection.name + '/entries'}).success(function(result) {
-        self.setEntries(collectionName, result);
+      if (skip) {
+        data.skip = skip;
+      }
+
+      if (filter) {
+        data.filter = filter;
+      }
+
+      return $http({method: 'GET', params: data, url: baseUrl + '/collections/' + collection.name + '/entries'}).success(function(response) {
+        if (response.result) {
+          self.setEntries(collectionName, response.result);
+        }
       });
     },
     setCollections: function(items)
@@ -602,18 +630,41 @@ app.controller('EntryEditCtrl', function($scope, $rootScope, $routeParams, $loca
 app.controller('EntriesListCtrl', function($scope, $routeParams, $location, $rootScope, AppService, CollectionService, flash) {
   var collectionName = $routeParams.collectionName;
 
-  CollectionService.loadEntries(collectionName);
-
   $scope.collectionName = collectionName;
   
   $scope.selectedEntries = [];
 
   $scope.collection = CollectionService.getByName(collectionName);
 
+  $scope.filter = null;
+
+  $scope.skip = 0;
+
+  $scope.limit = 15;
+
   if (! $scope.collection) {
     $location.path('/collections');
     return;
   }
+
+  $scope.$watch('filter', function(value) {
+    $scope.skip = 0;
+    CollectionService.loadEntries(collectionName, $scope.skip, $scope.filter);
+  });
+
+  $scope.loadMore = function()
+  {
+    $scope.skip = $scope.skip + $scope.limit;
+    CollectionService.loadEntries(collectionName, $scope.skip, $scope.filter);
+  };
+
+  $scope.focusFilter = function(event)
+  {
+    event.preventDefault();
+    event.stopPropagation();
+
+    document.querySelector('.option-filter-input').focus();
+  };
 
   $scope.selectEntry = function(entryId)
   {
@@ -671,8 +722,17 @@ app.controller('EntriesListCtrl', function($scope, $routeParams, $location, $roo
     return date.getDate() + '-' + date.getMonth() + '-' + date.getFullYear();
   };
 
+  // $scope.formatDate = function(str)
+  // {
+  //   return moment(str).humanize();
+  // };
+
   $scope.pretifyValue = function(val, field)
   {
+    if (!val) {
+      return '';
+    }
+
     switch (field.type) {
       case 'media':
         if (val.match(/(jpg|jpeg|png|gif)$/)) {

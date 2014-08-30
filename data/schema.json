@@ -60,7 +60,7 @@
                 "collection": "photos"
             },
             {
-                "name": "prosucts",
+                "name": "products",
                 "sort": 1,
                 "type": "collectionMany",
                 "label": "Products",

@@ -13,6 +13,8 @@ class Storage
   private $filter=[];
   private $populate=[];
 
+  private $params=[];
+
   private $connection;
   private $schema;
 
@@ -362,46 +364,47 @@ class Storage
     $sqlParams = null;
 
     if (! empty($filter)) {
-      $sqlParams = [];
-      $and = [];
+      // $sqlParams = [];
+      // $and = [];
 
-      foreach ($filter as $column=>$value) {
-        if (is_array($value) && $this->isAssocArray($value)) {
-          if (isset($value['from'])) {
-            $placeholder = ':' . $column . '_' . uniqid();
-            $and[] = " {$column} >= {$placeholder} ";
-            $sqlParams[$placeholder] = $value['from'];
-          }
+      // foreach ($filter as $column=>$value) {
+      //   if (is_array($value) && $this->isAssocArray($value)) {
+      //     if (isset($value['from'])) {
+      //       $placeholder = ':' . $column . '_' . uniqid();
+      //       $and[] = " {$column} >= {$placeholder} ";
+      //       $sqlParams[$placeholder] = $value['from'];
+      //     }
 
-          if (isset($value['to'])) {
-            $placeholder = ':' . $column . '_' . uniqid();
-            $and[] = " {$column} <= {$placeholder} ";
-            $sqlParams[$placeholder] = $value['to'];
-          }
+      //     if (isset($value['to'])) {
+      //       $placeholder = ':' . $column . '_' . uniqid();
+      //       $and[] = " {$column} <= {$placeholder} ";
+      //       $sqlParams[$placeholder] = $value['to'];
+      //     }
 
-          if (isset($value['like'])) {
-            $placeholder = ':' . $column . '_' . uniqid();
-            $and[] = " {$column} LIKE {$placeholder} ";
-            $sqlParams[$placeholder] = $value['like'];
-          }
-        } else if (is_array($value)) {
-          $or = [];
+      //     if (isset($value['like'])) {
+      //       $placeholder = ':' . $column . '_' . uniqid();
+      //       $and[] = " {$column} LIKE {$placeholder} ";
+      //       $sqlParams[$placeholder] = $value['like'];
+      //     }
+      //   } else if (is_array($value)) {
+      //     $or = [];
 
-          foreach ($value as $orColumn=>$orValue) {
-            $placeholder = ':' . $column . '_' . uniqid();
-            $or[] = " {$column}={$placeholder} ";
-            $sqlParams[$placeholder] = $orValue;
-          }
+      //     foreach ($value as $orColumn=>$orValue) {
+      //       $placeholder = ':' . $column . '_' . uniqid();
+      //       $or[] = " {$column}={$placeholder} ";
+      //       $sqlParams[$placeholder] = $orValue;
+      //     }
 
-          $and[] = ' (' . implode(' OR ', $or) . ') ';
-        } else {
-          $placeholder = ':' . $column . '_' . uniqid();
-          $and[] = " {$column}={$placeholder} ";
-          $sqlParams[$placeholder] = $value;
-        }
-      }
+      //     $and[] = ' (' . implode(' OR ', $or) . ') ';
+      //   } else {
+      //     $placeholder = ':' . $column . '_' . uniqid();
+      //     $and[] = " {$column}={$placeholder} ";
+      //     $sqlParams[$placeholder] = $value;
+      //   }
+      // }
 
-      $sqlWhere = ' WHERE ' . implode(' AND ', $and);
+      // $sqlWhere = ' WHERE ' . implode(' AND ', $and);
+      $sqlWhere = ' WHERE ' . $this->buildFilterSql($filter) . ' ';
     }
 
     if ($limit !== null) {
@@ -422,8 +425,8 @@ class Storage
 
     $sth = $this->connection->prepare($sql);
 
-    if (! empty($sqlParams)) {
-      foreach ($sqlParams as $key => $value) {
+    if (! empty($this->params)) {
+      foreach ($this->params as $key => $value) {
         $type = PDO::PARAM_STR;
 
         if (is_int($value)) {
@@ -483,48 +486,50 @@ class Storage
     }
 
     if (! empty($filter)) {
-      $sqlParams = [];
-      $and = [];
+      // $sqlParams = [];
+      // $and = [];
 
-      foreach ($filter as $column=>$value) {
-        if (is_array($value) && $this->isAssocArray($value)) {
-          if (isset($value['from'])) {
-            $placeholder = ':' . $column . '_' . uniqid();
-            $and[] = " {$column} >= {$placeholder} ";
-            $sqlParams[$placeholder] = $value['from'];
-          }
+      // foreach ($filter as $column=>$value) {
+      //   if (is_array($value) && $this->isAssocArray($value)) {
+      //     $conditions = [];
 
-          if (isset($value['to'])) {
-            $placeholder = ':' . $column . '_' . uniqid();
-            $and[] = " {$column} <= {$placeholder} ";
-            $sqlParams[$placeholder] = $value['to'];
-          }
+      //     if (isset($value['from'])) {
+      //       $placeholder = ':' . $column . '_' . uniqid();
+      //       $conditions[] = " {$column} >= {$placeholder} ";
+      //       $sqlParams[$placeholder] = $value['from'];
+      //     }
 
-          if (isset($value['like'])) {
-            $placeholder = ':' . $column . '_' . uniqid();
-            $and[] = " {$column} LIKE {$placeholder} ";
-            $sqlParams[$placeholder] = $value['like'];
-          }
-        } else if (is_array($value)) {
-          $or = [];
+      //     if (isset($value['to'])) {
+      //       $placeholder = ':' . $column . '_' . uniqid();
+      //       $conditions[] = " {$column} <= {$placeholder} ";
+      //       $sqlParams[$placeholder] = $value['to'];
+      //     }
 
-          foreach ($value as $orColumn=>$orValue) {
-            $placeholder = ':' . $column . '_' . uniqid();
-            $or[] = " {$column}={$placeholder} ";
-            $sqlParams[$placeholder] = $orValue;
-          }
+      //     if (isset($value['like'])) {
+      //       $placeholder = ':' . $column . '_' . uniqid();
+      //       $conditions[] = " {$column} LIKE {$placeholder} ";
+      //       $sqlParams[$placeholder] = $value['like'];
+      //     }
+      //   } else if (is_array($value)) {
+      //     $or = [];
 
-          $and[] = ' (' . implode(' OR ', $or) . ') ';
-        } else {
-          $placeholder = ':' . $column . '_' . uniqid();
-          $and[] = " {$column}={$placeholder} ";
-          $sqlParams[$placeholder] = $value;
-        }
-      }
+      //     foreach ($value as $orColumn=>$orValue) {
+      //       $placeholder = ':' . $column . '_' . uniqid();
+      //       $or[] = " {$column} = {$placeholder} ";
+      //       $sqlParams[$placeholder] = $orValue;
+      //     }
 
-      $sqlWhere = ' WHERE ' . implode(' AND ', $and);
+      //     $and[] = ' (' . implode(' OR ', $or) . ') ';
+      //   } else {
+      //     $placeholder = ':' . $column . '_' . uniqid();
+      //     $and[] = " {$column} = {$placeholder} ";
+      //     $sqlParams[$placeholder] = $value;
+      //   }
+      // }
+
+      $sqlWhere = ' WHERE ' . $this->buildFilterSql($filter) . ' '; //implode(' AND ', $and);
     }
-
+    
     if ($limit !== null) {
       $sqlLimit = " LIMIT {$limit} ". ($skip ? " OFFSET {$skip} ": '');
     }
@@ -543,8 +548,8 @@ class Storage
 
     $sth = $this->connection->prepare($sql);
 
-    if (! empty($sqlParams)) {
-      foreach ($sqlParams as $key => $value) {
+    if (! empty($this->params)) {
+      foreach ($this->params as $key => $value) {
         $type = PDO::PARAM_STR;
 
         if (is_int($value)) {
@@ -911,6 +916,8 @@ class Storage
     $this->skip = null;
     $this->filter = [];
     $this->populate = [];
+
+    $this->params = [];
   }
 
   /**
@@ -925,5 +932,57 @@ class Storage
     }
 
     return false;
+  }
+
+  /**
+   *
+   */
+  private function buildFilterSql(array $filters)
+  {
+    if ($this->isAssocArray($filters)) {
+      $or = [];
+
+      foreach ($filters as $field => $value) {
+        if (is_array($value) && $this->isAssocArray($value)) {
+          if (isset($value['from'])) {
+            $placeholder = ':' . $field . '_' . uniqid();
+            $or[] = " {$field} >= {$placeholder} ";
+            $this->params[$placeholder] = $value['from'];
+          }
+
+          if (isset($value['to'])) {
+            $placeholder = ':' . $field . '_' . uniqid();
+            $or[] = " {$field} <= {$placeholder} ";
+            $this->params[$placeholder] = $value['to'];
+          }
+
+          if (isset($value['like'])) {
+            $placeholder = ':' . $field . '_' . uniqid();
+            $or[] = " {$field} LIKE {$placeholder} ";
+            $this->params[$placeholder] = $value['like'];
+          }
+        } else if (is_array($value)) {
+          foreach ($value as $fieldName=>$fieldValue) {
+            $placeholder = ':' . $fieldName . '_' . uniqid();
+            $or[] = " {$fieldName} = {$placeholder} ";
+            $this->params[$placeholder] = $fieldValue;
+          }
+        } else {
+          $placeholder = ':' . $field . '_' . uniqid();
+          $or[] = " {$field} = {$placeholder} ";
+          $this->params[$placeholder] = $value;
+        }
+      }
+
+      return ' (' . implode(' OR ', $or) . ') ';
+    } else {
+      $and = [];
+
+      foreach ($filters as $filter) {
+        $and[] = $this->buildFilterSql($filter);
+      }
+
+      return implode(' AND ', $and);
+    }
   }
 }

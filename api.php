@@ -96,15 +96,49 @@ $app->get('/collections/:name/entries', function($name) use ($app) {
 
   $entries = $collection->populate(true);
 
-  $ids = $app->request->get('ids');
+  $filterParam = $app->request->get('filter');
 
-  if ($ids) {
-    $entries->filter([ 'id' => $ids ]);
+  if ($filterParam) {
+    $filters = [];
+
+    foreach ($schema['fields'] as $field) {
+      if (! isset($field['displayed']) || $field['displayed'] === false || $field['type'] === 'collectionOne' || $field['type'] === 'collectionMany') {
+        continue;
+      }
+      
+      $filters[$field['name']] = ['like' => '%' . trim($filterParam) . '%'];
+    }
+
+     $entries->filter($filters);
+  }
+
+  // $ids = $app->request->get('ids');
+
+  // if ($ids) {
+  //   $entries->filter([ 'id' => $ids ]);
+  // }
+
+  $skipParam = $app->request->get('skip');
+
+  $entries->limit(15);
+
+  if ($skipParam) {
+    $entries->skip($skipParam);
   }
 
   $entries = $entries->all();
 
-  $app->response->write(json_encode($entries));
+  $app->response->write(json_encode([
+    'result' => $entries,
+  ]));
+});
+
+$app->get('/collections/:name/total', function($name) use ($app) {
+  $total = $app->storage->collection($name)->count();
+
+  $app->response->write(json_encode([
+    'result' => $total,
+  ]));
 });
 
 // update collection entries
@@ -127,7 +161,7 @@ $app->post('/collections/:name/entries', function($name) use ($app) {
 // delete collection entries
 $app->delete('/collections/:name/entries', function($name) use ($app) {
   $data = json_decode($app->request->getBody(), true);
-// var_dump($data);
+
   $result = $app->storage->collection($name)->remove($data);
 
   $app->response->write(json_encode([
@@ -137,7 +171,11 @@ $app->delete('/collections/:name/entries', function($name) use ($app) {
 
 // test
 $app->get('/test', function() use ($app) {
-  $result = $app->storage->collection('user')->filter(['id'=>['from'=>2, 'to'=>2]])->all();
+  // $result = $app->storage->collection('user')->filter(['id'=>['from'=>2, 'to'=>2]])->all();
+
+  $result = $app->storage->collection('user')->filter([
+    'id'=>['from'=>2, 'to'=>2],
+  ])->all();
 
   $app->response->write(json_encode($result));
 });
