@@ -250,7 +250,7 @@ app.factory("CollectionService", function($http) {
       var self = this;
       var data = {};
 
-      if (typeof collection.entries != 'undefined' && skip === 0) {
+      if (typeof collection.entries != 'undefined' && ! skip) {
         collection.entries.splice(0, collection.entries.length);
       }
 
