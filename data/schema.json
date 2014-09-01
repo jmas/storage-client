@@ -28,10 +28,20 @@
                 "defaultValue": "",
                 "required": true,
                 "displayed": false
+            },
+            {
+                "name": "posts",
+                "sort": 1,
+                "type": "collectionMany",
+                "label": "Posts",
+                "defaultValue": "",
+                "required": false,
+                "displayed": true,
+                "collection": "post"
             }
         ],
-        "sort": "name",
-        "sortType": "1",
+        "sort": "createdAt",
+        "sortType": "-1",
         "label": "Users"
     },
     {

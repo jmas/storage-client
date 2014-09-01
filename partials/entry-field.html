@@ -47,7 +47,7 @@
       <input type="text" ng-model="entry[field.name]" />
     </div>
     <div ng-switch-when="collectionOne">
-      <entry fields="getCollectionFields(field.collection)" record="entry[field.name]"></entry>
+      <entry fields="getCollectionFields(field.collection)" record="entry[field.name]" ng-if="entry[field.name]"></entry>
     </div>
     <div ng-switch-when="collectionMany">
       <entry ng-repeat="record in entry[field.name]" fields="getCollectionFields(field.collection)" record="record"></entry>

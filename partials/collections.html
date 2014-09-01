@@ -1,0 +1,17 @@
+<div id="collections">
+  <div class="collections-options">
+    <a href="#collections/create" class="btn trusty">Create</a>
+  </div>
+  <div class="collection-list">
+    <div class="item" ng-repeat-reorder="item in collections" ng-repeat-reorder-handle>
+      <div class="name">
+        <a href="#collections/{{item.name}}/entries">{{item.label || item.name}}</a>
+        <span class="real-name" ng-if="item.label">{{item.name}}</span>
+      </div>
+      <div class="options">
+        <a href="#collections/{{item.name}}/edit"><img src="images/setup.png" /></a>
+        <a ng-click="removeCollection(item.name)"><img src="images/remove.png" /></a>
+      </div>
+    </div>
+  </div>
+</div>

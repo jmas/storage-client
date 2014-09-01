@@ -74,7 +74,9 @@ $app->post('/collections/:name', function ($name) use ($app) {
 
     $collectionScema = $app->storage->getCollectionSchema($data['name']);
 
-    $app->response->write(json_encode($collectionScema));
+    $app->response->write(json_encode([
+      'result' => $collectionScema,
+    ]));
     return;
   }
 });

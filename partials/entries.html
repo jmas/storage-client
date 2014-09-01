@@ -1,5 +1,5 @@
 <div class="entry-list-options">
-  <a href="#collections/{{collection.name}}/entries/create" class="btn trusty">Create</a>
+  <a ng-click="createEntry()" class="btn trusty">Create</a>
   <a class="btn select-all-btn" ng-click="selectAll()" ng-class="{active: !isAllSelected()}">Select All</a>
   <a class="btn deselect-all-btn" ng-click="deselectAll()" ng-class="{active: isSelected()}">Deselect</a>
   <a class="btn danger remove-btn" ng-click="removeSelected()" ng-class="{active: isSelected()}">Remove Selected</a>
