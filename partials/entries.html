@@ -10,7 +10,7 @@
 </div>
 
 <div class="entries">
-  <entry ng-repeat="record in collection.entries" fields="collection.fields" record="record">
+  <entry ng-repeat="record in collection.entries" fields="collection.fields" record="record" ng-if="record.id">
     <div class="options">
       <a ng-click="editEntry(record.id)">
         <img src="images/edit.png" />
