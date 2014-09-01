@@ -44,16 +44,16 @@
 
     <div ng-controller="EntrySelectDialogCtrl">
       <ng-dialog>
-        <div class="entry-select-filter">
+        <div class="entry-select-filter" ng-if="! isView">
           <input type="text" placeholder="Filter" ng-model="params.filter" debounce="500" autofocus />
         </div>
         <div class="entries">
           <entry ng-repeat="record in collection.entries" fields="collection.fields" record="record" on-active="onActive"></entry>
         </div>
-        <div class="load-more-trigger">
+        <div class="load-more-trigger" ng-if="! isView">
           <a ng-click="loadMoreEntries()">Load More</a>
         </div>
-        <div class="buttons-right">
+        <div class="buttons-right" ng-if="! isView">
           <button class="btn primary" ng-click="select()">Select</button>
         </div>
         <div class="buttons-left">

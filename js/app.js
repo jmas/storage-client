@@ -60,7 +60,7 @@ app.directive('entry', function() {
       record: '=',
       onActive: '&'
     },
-    controller: function($scope) {
+    controller: function($scope, $rootScope) {
       $scope.toggleActive = function() {
         if ($scope.onActive()) {
           $scope.onActive()($scope.record, ! $scope.record._active);
@@ -69,6 +69,10 @@ app.directive('entry', function() {
 
       $scope.humanizeDate = function(date) {
         return moment(date).fromNow();
+      };
+
+      $scope.viewEntries = function(field, entry) {
+        $rootScope.$emit('entry:view', field, entry);
       };
     },
     templateUrl: 'partials/entry.html'
@@ -206,7 +210,7 @@ app.factory('EntriesService', function($http) {
         entry[item.name] = null;
       }
 
-      collection.entries.push(entry);
+      collection.entries.unshift(entry);
 
       return entry;
     },
@@ -382,7 +386,6 @@ app.factory('EntriesService', function($http) {
 
     saveCollection: function(collectionName) {
       var me = this;
-
       var collection = this.getCollection(collectionName);
 
       if (typeof collection._name == 'undefined') {
@@ -390,7 +393,6 @@ app.factory('EntriesService', function($http) {
       }
 
       var name = collection._name;
-
       var data = {};
 
       for (var i in collection.fields) {
@@ -718,8 +720,9 @@ app.controller('EntryEditDialogCtrl', function($scope, $rootScope, EntriesServic
 app.controller('EntrySelectDialogCtrl', function($scope, $rootScope, EntriesService) {
   $scope.collectionName = null;
 
-  $scope.title = 'Select Entry';
+  $scope.title = null;
   $scope.active = false;
+  $scope.isView = false;
 
   $scope.collection = null;
   $scope.entry = null;
@@ -735,7 +738,7 @@ app.controller('EntrySelectDialogCtrl', function($scope, $rootScope, EntriesServ
   var refreshEntries = function() {
     $scope.skip = 0;
 
-    if (! $scope.collectionName) {
+    if (! $scope.collectionName || $scope.isView) {
       return;
     }
 
@@ -811,6 +814,10 @@ app.controller('EntrySelectDialogCtrl', function($scope, $rootScope, EntriesServ
   };
 
   $scope.onActive = function(entry, isActive) {
+    if ($scope.isView) {
+      return;
+    }
+
     if ($scope.field.type == 'collectionOne') {
       for (var i=0,len=$scope.collection.entries.length; i<len; i++) {
         if ($scope.collection.entries[i].id == entry.id) {
@@ -835,6 +842,28 @@ app.controller('EntrySelectDialogCtrl', function($scope, $rootScope, EntriesServ
     $scope.field = field;
     $scope.params.filter = null;
     $scope.activeItems.splice(0, $scope.activeItems.length - 1);
+    $scope.isView = false;
+    $scope.title = 'Select Entry';
+
+    updateActiveItems();
+  });
+
+  $rootScope.$on('entry:view', function(event, field, entry) {
+    var fields = EntriesService.getCollectionFields(field.collection);
+
+    $scope.collectionName = field.collection;
+    $scope.collection = {
+      fields: fields,
+      entries: (field.type == 'collectionOne' ? [entry[field.name]]: entry[field.name])
+    };
+
+    $scope.active = true;
+    $scope.entry = entry[field.name];
+    $scope.field = field;
+    $scope.params.filter = null;
+    $scope.activeItems.splice(0, $scope.activeItems.length - 1);
+    $scope.isView = true;
+    $scope.title = 'View Entries';
 
     updateActiveItems();
   });
