@@ -381,7 +381,7 @@ app.factory('EntriesService', function($http) {
     },
 
     saveCollection: function(collectionName) {
-      var self = this;
+      var me = this;
 
       var collection = this.getCollection(collectionName);
 
@@ -414,7 +414,7 @@ app.factory('EntriesService', function($http) {
       })
         .success(function(response) {
           if (typeof response.result !== 'undefined') {
-            self.setCollection(collectionName, response.result);
+            me.setCollection(collectionName, response.result);
           }
         });
     },
@@ -721,7 +721,7 @@ app.controller('EntrySelectDialogCtrl', function($scope, $rootScope, EntriesServ
   $scope.title = 'Select Entry';
   $scope.active = false;
 
-  $scope.collection = [];
+  $scope.collection = null;
   $scope.entry = null;
   $scope.field = null;
   $scope.activeItems = [];
@@ -742,13 +742,37 @@ app.controller('EntrySelectDialogCtrl', function($scope, $rootScope, EntriesServ
     EntriesService.loadEntries($scope.collectionName, $scope.params.skip, $scope.params.limit, $scope.params.filter)
       .then(function() {
         $scope.collection = EntriesService.getCollection($scope.collectionName);
+        updateActiveItems();
+      });
+  };
 
-        for (var i=0,len=$scope.collection.entries.length; i<len; i++) {
-          if ($scope.activeItems.indexOf($scope.collection.entries[i].id) !== -1) {
-            $scope.collection.entries[i]._active = true;
+  var updateActiveItems = function() {
+    if (! $scope.collection || ! $scope.entry[$scope.field.name]) {
+      return;
+    }
+
+    if ($scope.field.type == 'collectionOne') {
+      for (var i=0,len=$scope.collection.entries.length; i<len; i++) {
+        if ($scope.collection.entries[i].id == $scope.entry[$scope.field.name].id) {
+          $scope.collection.entries[i]._active = true;
+        } else {
+          $scope.collection.entries[i]._active = false;
+        }
+      }      
+    } else if ($scope.field.type == 'collectionMany') {
+      for (var i=0,len=$scope.collection.entries.length; i<len; i++) {
+        var isFoundEntry = false;
+
+        for (var j=0,jlen=$scope.entry[$scope.field.name].length; j<jlen; j++) {
+          if ($scope.collection.entries[i].id == $scope.entry[$scope.field.name][j].id) {
+            isFoundEntry = true;
+            break; 
           }
         }
-      });
+
+        $scope.collection.entries[i]._active = isFoundEntry;
+      }
+    }
   };
 
   $scope.$watch('params.filter + params.skip + collectionName', refreshEntries);
@@ -807,18 +831,12 @@ app.controller('EntrySelectDialogCtrl', function($scope, $rootScope, EntriesServ
   $rootScope.$on('entry:select', function(event, field, entry) {
     $scope.collectionName = field.collection;
     $scope.active = true;
-    $scope.params.filter = null;
     $scope.entry = entry;
     $scope.field = field;
-    $scope.activeItems = [];
+    $scope.params.filter = null;
+    $scope.activeItems.splice(0, $scope.activeItems.length - 1);
 
-    if (field.type == 'collectionOne' && entry[field.name]) {
-      $scope.activeItems.push(entry[field.name].id);
-    } else if (field.type == 'collectionMany' && entry[field.name] && entry[field.name].length > 0) {
-      for (var i=0,len=entry[field.name].length; i<len; i++) {
-        $scope.activeItems.push(entry[field.name].id);
-      }
-    }
+    updateActiveItems();
   });
 });
 
