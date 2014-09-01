@@ -17,32 +17,32 @@ app.config(function($routeProvider, $locationProvider, cfpLoadingBarProvider) {
 
   $locationProvider.html5Mode(false);
 
-  $routeProvider.
-    when('/collections', {
+  $routeProvider
+    .when('/collections', {
       templateUrl: 'partials/collections-list.html',
       controller: 'CollectionsListCtrl'
-    }).
-    when('/collections/:collectionName/edit', {
+    })
+    .when('/collections/:collectionName/edit', {
       templateUrl: 'partials/collection-edit.html',
       controller: 'CollectionEditCtrl'
-    }).
-    when('/collections/create', {
+    })
+    .when('/collections/create', {
       templateUrl: 'partials/collection-edit.html',
       controller: 'CollectionEditCtrl'
-    }).
-    when('/collections/:collectionName/entries', {
-      templateUrl: 'partials/entries-list.html',
-      controller: 'EntriesListCtrl'
-    }).
-    when('/collections/:collectionName/entries/:entryId/edit', {
+    })
+    .when('/collections/:collectionName/entries/:entryId/edit', {
       templateUrl: 'partials/entry-edit.html',
       controller: 'EntryEditCtrl'
-    }).
-    when('/collections/:collectionName/entries/create', {
+    })
+    .when('/collections/:collectionName/entries/create', {
       templateUrl: 'partials/entry-edit.html',
       controller: 'EntryEditCtrl'
-    }).
-    otherwise({
+    })
+    .when('/collections/:collectionName/entries', {
+      templateUrl: 'partials/entries.html',
+      controller: 'EntriesCtrl'
+    })
+    .otherwise({
       redirectTo: '/collections'
     });
 });
@@ -66,6 +66,58 @@ app.directive('dateFormat', function() {
   };
 });
 
+app.directive('entry', function() {
+  return {
+    restrict: 'E',
+    transclude: true,
+    scope: {
+      fields: '=',
+      record: '='
+    },
+    controller: function($scope) {
+      $scope.toggleActive = function() {
+        $scope.record._active = ! $scope.record._active;
+      };
+    },
+    templateUrl: 'partials/entry.html'
+  };
+});
+
+app.directive('entries', function() {
+  return {
+    restrict: 'E',
+    scope: {
+      fields: '=',
+      records: '='
+    },
+    templateUrl: 'partials/entries.html'
+  };
+});
+
+app.directive('entryField', function() {
+  return {
+    restrict: 'E',
+    scope: {
+      field: '=',
+      entry: '='
+    },
+    templateUrl: 'partials/entry-field.html',
+    controller: function($scope, $rootScope, EntriesService) {
+      $scope.getCollectionFields = function(collectionName) {
+        return EntriesService.getCollectionFields(collectionName);
+      };
+
+      $scope.createAndSelectEntry = function(field, entry) {
+        $rootScope.$emit('entry:createAndSelect', field, entry);
+      };
+
+      $scope.selectEntry = function(field, entry) {
+        $rootScope.$emit('entry:select', field, entry);
+      };
+    }
+  };
+});
+
 app.directive('field', function() {
   return {
     restrict: 'E',
@@ -76,6 +128,15 @@ app.directive('field', function() {
       entry: '='
     },
     templateUrl: 'partials/field.html'
+  };
+});
+
+app.directive('ngDialog', function() {
+  return {
+    restrict: 'E',
+    transclude: true,
+    scope: true,
+    templateUrl: 'partials/dialog.html'
   };
 });
 
@@ -228,6 +289,228 @@ app.factory("AppService", function() {
       return app.breadcrumbs;
     }
   };
+});
+
+app.factory('EntriesService', function($http) {
+
+  return {
+    collections: [],
+
+    load: function(collectionName, skip, limit, filter) {
+      var me=this;
+
+      if (me.collections.length > 0) {
+        var collection = this.getCollection(collectionName);
+        var params = {};
+
+        if (typeof collection.entries != 'undefined' && ! skip) {
+          collection.entries.splice(0, collection.entries.length);
+        }
+
+        params.skip = skip || null;
+        params.filter = filter || null;
+        params.limit = limit || null;
+
+        return $http({
+          method: 'GET',
+          params: params,
+          url: baseUrl + '/collections/' + collection.name + '/entries'
+        }).success(function(response) {
+          if (response.result) {
+            me.setEntries(collectionName, response.result);
+          }
+        });
+      } else {
+        return $http({method: 'GET', url: baseUrl + '/collections'})
+          .success(function(response) {
+            if (typeof response.result !== 'undefined' && response.result.length > 0) {
+              me.setCollections(response.result);
+              me.load(collectionName, skip, limit, filter);
+            }
+          });
+      }
+    },
+
+    getEntry: function(collectionName, entryId) {
+      var collection = this.getCollection(collectionName);
+
+      if (! collection || typeof collection.entries == 'undefined') {
+        return null;
+      }
+
+      for (var i=0,len=collection.entries.length; i<len; i++) {
+        if (collection.entries[i].id == entryId) {
+          return collection.entries[i];
+        }
+      }
+
+      return null;
+    },
+
+    setEntry: function(collectionName, entry)
+    {
+      var collection = this.getCollection(collectionName);
+      var isEntryFound = false;
+
+      if (typeof collection.entries == 'undefined') {
+        collection.entries = [];
+      }
+
+      for (var i=0, len=collection.entries.length; i<len; i++) {
+        if (collection.entries[i].id == entry.id) {
+          collection.entries[i] = entry;
+          isEntryFound = true;
+          break;
+        }
+      }
+
+      if (! isEntryFound) {
+        collection.entries.push(entry);
+      }
+    },
+
+    setEntries: function(collectionName, items) {
+      var collection = this.getCollection(collectionName);
+
+      if (typeof collection.entries === 'undefined') {
+        collection.entries = [];
+      }
+
+      for (var i=0,len=items.length; i<len; i++) {
+        collection.entries.push(items[i]);
+      }
+    },
+
+    removeEntries: function(collectionName, entriesIds) {
+      var collection = this.getCollection(collectionName);
+
+      return $http({
+        method: 'DELETE',
+        data: entriesIds,
+        url: baseUrl + '/collections/' + collectionName + '/entries'
+      })
+        .success(function(result) {
+          if (typeof data.error === 'undefined') {
+            for (var i=0,leni=entriesIds.length; i<leni; i++) {
+              for (var j=0,lenj=collection.entries.length; j<lenj; j++) {
+                if (entriesIds.indexOf(collection.entries[j].id) !== -1) {
+                  collection.entries.splice(j, 1);
+                  break;
+                }
+              }
+            }
+          }
+        });
+    },
+
+    saveEntry: function(collectionName, entry)
+    {
+      var me = this;
+      var collection = this.getCollection(collectionName);
+
+      for (var k in entry) {
+        if (k == 'id' && entry.id === null) {
+          delete entry.id;
+          break;
+        }
+      }
+
+      return $http({
+        method: 'POST',
+        data: entry,
+        url: baseUrl + '/collections/' + collection.name + '/entries'
+      })
+        .success(function(response) {
+          if (typeof response.error === 'undefined') {
+            entry.id = response.result.id;
+            me.setEntry(collectionName, response.result);
+          }
+        });
+    },
+
+    getCollection: function(collectionName) {
+      for (var i=0,len=this.collections.length; i<len; i++) {
+        if (this.collections[i].name == collectionName) {
+          return this.collections[i];
+        }
+      }
+
+      return null;
+    },
+
+    setCollection: function(collectionName, data) {
+      var collection = this.getCollection(collectionName);
+      
+      if (! collection) {
+        this.collections.push(data);
+      }
+
+      for (var k in data) {
+        collection[k] = data[k];
+      }
+    },
+
+    setCollections: function(items) {
+      for (var i=0,len=items.length; i<len; i++) {
+        items[i]._name = items[i].name;
+
+        if (typeof items[i].fields != 'undefined') {
+          for (var j=0,jlen=items[i].fields.length; j<jlen; j++) {
+            items[i].fields[j]._name = items[i].fields[j].name;
+          }
+        }
+
+        this.collections.push(items[i]);  
+      }
+    },
+
+    getCollectionField: function(collectionName, fieldName) {
+      var collection = this.getCollection(collectionName);
+
+      for (var i=0, len=collection.fields.length; i<len; i++) {
+        if (collection.fields[i].name == fieldName) {
+          return collection.fields[i];
+        }
+      }
+
+      return null;
+    },
+
+    getCollectionFields: function(collectionName) {
+      var collection = this.getCollection(collectionName);
+
+      if (collection) {
+        return collection.fields;
+      }
+
+      return null;
+    },
+
+    addCollectionField: function(collectionField, data) {
+      var collection = this.getCollection(collectionName);
+
+      if (typeof collection.fields === 'undefined') {
+        collection.fields = [];
+      }
+
+      data = data || {};
+
+      collection.fields.push(data);
+    },
+
+    removeCollectionField: function(collectionName, fieldName)
+    {
+      var collection = this.getCollection(collectionName);
+
+      for (var i=0, len=collection.fields.length; i<len; i++) {
+        if (collection.fields[i].name == fieldName) {
+          collection.fields.splice(i, 1);
+          break;
+        }
+      }
+    }
+  };
+
 });
 
 app.factory("CollectionService", function($http) {
@@ -400,13 +683,18 @@ app.factory("CollectionService", function($http) {
       collection.fields.splice(index, 1);
     },
     removeCollection: function(collectionName)
-    {
-      // for (var i=0,len=collections.length; i<len; i++) {
-      //   if (collections[i].id == collectionId) {
-      //     collections.splice(i, 1);
-      //     break;
-      //   }
-      // }
+    { 
+      return $http({method: 'DELETE', url: baseUrl + '/collections/' + collectionName})
+        .success(function(d) {
+          if (typeof d.error == 'undefined') {
+            for (var i=0,len=data.collections.length; i<len; i++) {
+              if (data.collections[i].name == collectionName) {
+                data.collections.splice(i, 1);
+                break;
+              }
+            }
+          }
+        });
 
       // data.collections.splice(collectionId, 1);
     },
@@ -652,6 +940,11 @@ app.controller('EntriesListCtrl', function($scope, $routeParams, $location, $roo
     CollectionService.loadEntries(collectionName, $scope.skip, $scope.filter);
   });
 
+  $scope.doActive = function()
+  {
+    console.log(arguments);
+  };
+
   $scope.loadMore = function()
   {
     $scope.skip = $scope.skip + $scope.limit;
@@ -789,6 +1082,7 @@ app.controller('CollectionsListCtrl', function($scope, AppService, CollectionSer
   });
 
   $scope.removeCollection = function(collectionName) {
+    console.log(collectionName);
     CollectionService.removeCollection(collectionName);
   };
 });
@@ -889,5 +1183,185 @@ app.controller('CollectionEditCtrl', function($scope, $routeParams, $location, A
     name: 'Collections'
   }, $scope.collection.name ? 'Editing ' + ' ' + ($scope.collection.label || $scope.collection.name): 'Creating' ]);
 });
+
+
+
+
+
+
+
+
+app.controller('EntriesCtrl', function($scope, $rootScope, $routeParams, EntriesService, flash) {
+  $scope.collectionName = $routeParams.collectionName;
+
+  $scope.collection = [];
+
+  $scope.skip = null;
+  $scope.limit = null || 25;
+  $scope.filter = null;
+
+  $scope.$watch('filter', function(value) {
+    $scope.skip = 0;
+
+    EntriesService.load($scope.collectionName, $scope.skip, $scope.limit, $scope.filter)
+      .then(function() {
+        $scope.collection = EntriesService.getCollection($scope.collectionName);
+      });
+  });
+
+  $scope.loadMoreEntries = function() {
+    $scope.skip = $scope.skip + $scope.limit;
+    EntriesService.load($scope.collectionName, $scope.skip, $scope.limit, $scope.filter);
+  };
+
+  $scope.editEntry = function(entryId) {
+    var entry = EntriesService.getEntry($scope.collectionName, entryId);
+    $rootScope.$emit('entry:edit', $scope.collectionName, entry);
+  };
+
+  $scope.removeEntry = function(entryId) {
+    EntriesService.removeEntries($scope.collectionName, [entryId])
+      .then(function() {
+        flash('success', 'Removed successfully!');
+      });
+  };
+});
+
+
+app.controller('EntryEditDialogCtrl', function($scope, $rootScope, EntriesService) {
+  $scope.active = false;
+  $scope.editingItems = [];
+  $scope.editing = {};
+
+  $scope.save = function() {
+    EntriesService.saveEntry($scope.editing.collectionName, $scope.editing.entry)
+      .then(function(response) {
+        // var entry = EntriesService.getEntry($scope.editing.collectionName, response.data.id);
+
+        if ($scope.editing.targetEntry && $scope.editing.targetField) {
+          if ($scope.editing.targetField.type == 'collectionOne') {
+            $scope.editing.targetEntry[$scope.editing.targetField.name] = $scope.editing.entry;
+          } else {
+            if (typeof $scope.editing.targetEntry[$scope.editing.targetField.name] === 'undefined') {
+              $scope.editing.targetEntry[$scope.editing.targetField.name] = [];
+            }
+
+            $scope.editing.targetEntry[$scope.editing.targetField.name].push($scope.editing.entry);
+          }
+        }
+
+        $scope.editingItems.splice($scope.editingItems.length - 1, 1);
+
+        if ($scope.editingItems.length > 0) {
+          $scope.editing = $scope.editingItems[$scope.editingItems.length - 1];
+        } else {
+          $scope.active = false;
+        }
+      });
+  };
+
+  $scope.cancel = function() {
+    $scope.editingItems.splice($scope.editingItems.length - 1, 1);
+
+    if ($scope.editingItems.length > 0) {
+      $scope.editing = $scope.editingItems[$scope.editingItems.length - 1];
+      $scope.title = $scope.editing.title;
+    } else {
+      $scope.active = false;
+    }
+  };
+
+  $rootScope.$on('entry:edit', function(event, collectionName, entry) {
+    $scope.editingItems.push({
+      title: 'Edit Entry',
+      collectionName: collectionName,
+      entry: entry,
+      fields: EntriesService.getCollectionFields(collectionName),
+      targetEntry: null,
+      targetField: null
+    });
+
+    $scope.editing = $scope.editingItems[$scope.editingItems.length - 1];
+
+    $scope.title = $scope.editing.title;
+    $scope.active = true;
+  });
+
+  $rootScope.$on('entry:createAndSelect', function(event, field, entry) {
+    $scope.editingItems.push({
+      title: 'Create and Select Entry',
+      collectionName: field.collection,
+      entry: {},
+      fields: EntriesService.getCollectionFields(field.collection),
+      targetEntry: entry,
+      targetField: field
+    });
+
+    $scope.editing = $scope.editingItems[$scope.editingItems.length - 1];
+
+    $scope.title = $scope.editing.title;
+    $scope.active = true;
+  });
+
+
+  // $rootScope.$on('entry:select', function(event, field, entry) {
+
+  // });
+});
+
+app.controller('EntrySelectDialogCtrl', function($scope, $rootScope, EntriesService) {
+  $scope.collectionName = null;
+
+  $scope.title = 'Select Entry';
+  $scope.active = false;
+
+  $scope.collection = [];
+  $scope.entry = null;
+  $scope.field = null;
+
+  $scope.params = {
+    skip: null,
+    limit: null || 10,
+    filter: null
+  };
+
+  var refreshEntries = function() {
+    $scope.skip = 0;
+
+    if (! $scope.collectionName) {
+      return;
+    }
+
+    EntriesService.load($scope.collectionName, $scope.params.skip, $scope.params.limit, $scope.params.filter)
+      .then(function() {
+        $scope.collection = EntriesService.getCollection($scope.collectionName);
+      });
+  };
+
+  $scope.$watch('params.filter + params.skip + collectionName', refreshEntries);
+
+  $scope.select = function() {
+    $scope.active = false;
+  };
+
+  $scope.cancel = function() {
+    $scope.active = false;
+  };
+
+  $scope.loadMoreEntries = function() {
+    $scope.params.skip = $scope.params.skip + $scope.params.limit;
+  };
+
+  $rootScope.$on('entry:select', function(event, field, entry) {
+    $scope.collectionName = field.collection;
+    $scope.active = true;
+    $scope.params.filter = null;
+    $scope.entry = entry;
+    $scope.field = field;
+    refreshEntries();
+  });
+});
+
+
 
 })(angular);

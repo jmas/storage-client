@@ -2,6 +2,7 @@
 <html ng-app="app">
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
     <title>app</title>
     <!-- <base href="/orm/" /> -->
     <link rel="stylesheet" href="bower_components/angular-loading-bar/build/loading-bar.min.css" />
@@ -24,6 +25,41 @@
       <flash:messages></flash:messages>
 
       <entry-browser-dialog></entry-browser-dialog>
+    </div>
+
+    <div ng-controller="EntryEditDialogCtrl">
+      <ng-dialog>
+        <div class="entry-form">
+          <entry-field ng-repeat="field in editing.fields" field="field" entry="editing.entry"></entry-field>
+
+          <div class="buttons-right">
+            <button class="btn primary" ng-click="save()">Save</button>
+          </div>
+          <div class="buttons-left">
+            <button class="btn simple" ng-click="cancel()">Cancel</button>
+          </div>
+        </div>
+      </ng-dialog>
+    </div>
+
+    <div ng-controller="EntrySelectDialogCtrl">
+      <ng-dialog>
+        <div class="entry-select-filter">
+          <input type="text" placeholder="Filter" ng-model="params.filter" debounce="500" autofocus />
+        </div>
+        <div class="entries">
+          <entry ng-repeat="record in collection.entries" fields="collection.fields" record="record"></entry>
+        </div>
+        <div class="load-more-trigger">
+          <a ng-click="loadMoreEntries()">Load More</a>
+        </div>
+        <div class="buttons-right">
+          <button class="btn primary" ng-click="select()">Select</button>
+        </div>
+        <div class="buttons-left">
+          <button class="btn simple" ng-click="cancel()">Cancel</button>
+        </div>
+      </ng-dialog>
     </div>
 
   </body>

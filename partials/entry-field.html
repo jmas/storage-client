@@ -1,0 +1,56 @@
+<div class="entry-field">
+  <label class="entry-field-label">{{field.label || field.name}}</label>
+
+  <div class="entry-field-actions" ng-if="field.type == 'collectionOne' || field.type == 'collectionMany'">
+    <button class="btn small" ng-click="selectEntry(field, entry)">Select</button>
+    <span class="or">or</span>
+    <button class="btn small" ng-click="createAndSelectEntry(field, entry)">Create</button>
+  </div>
+
+  <div ng-switch="field.type">
+    <div ng-switch-when="text">
+      <input type="text" ng-model="entry[field.name]" />
+    </div>
+    <div ng-switch-when="datetime">
+      <input type="text" ng-model="entry[field.name]" />
+    </div>
+    <div ng-switch-when="number">
+      <input type="text" ng-model="entry[field.name]" />
+    </div>
+    <div ng-switch-when="float">
+      <input type="text" ng-model="entry[field.name]" />
+    </div>
+    <div ng-switch-when="password">
+      <input type="password" ng-model="entry[field.name]" />
+    </div>
+    <div ng-switch-when="email">
+      <input type="email" ng-model="entry[field.name]" />
+    </div>
+    <div ng-switch-when="select">
+      <select ng-model="entry[field.name]">
+        <option value="{{item}}" ng-repeat="item in field.options" ng-selected="entry[field.name] == item">{{item}}</option>
+      </select>
+    </div>
+    <div ng-switch-when="boolean">
+      <input type="checkbox" ng-model="entry[field.name]" ng-checked="entry[field.name] === '1'" />
+    </div>
+    <div ng-switch-when="wysiwyg">
+      <text-angular ng-model="entry[field.name]"></text-angular>
+    </div>
+    <div ng-switch-when="multiline">
+      <textarea ng-model="entry[field.name]"></textarea>
+    </div>
+    <div ng-switch-when="datetime">
+      <input type="checkbox" ng-model="entry[field.name]" />
+    </div>
+    <div ng-switch-when="media">
+      <input type="text" ng-model="entry[field.name]" />
+    </div>
+    <div ng-switch-when="collectionOne">
+      <entry fields="getCollectionFields(field.collection)" record="entry[field.name]"></entry>
+    </div>
+    <div ng-switch-when="collectionMany">
+      <entry ng-repeat="record in entry[field.name]" fields="getCollectionFields(field.collection)" record="record"></entry>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,19 @@
+<div class="entry" ng-class="{active: record._active}" ng-click="toggleActive()">
+  <div class="field-list">
+    <div class="field-item" ng-repeat="field in fields" ng-if="field.displayed">
+      <span class="field-label" ng-class="{required: field.required}"><acronym title="{{field.name}}">{{field.label || field.name}}</acronym></span>
+      <span class="field-value" ng-if="! field.collection">{{record[field.name]}}</span>
+      <span class="field-value" ng-if="record.collection && record[field.name] && record[field.name] != 0"><a ng-click="viewEntries(field.collection, record[field.name], field)">View</a></span>
+      <span class="field-value" ng-if="field.collection && (! record[field.name] || record[field.name] == 0)"></span>
+    </div>
+    <div class="field-item">
+      <span class="field-label"><acronym title="updatedAt">Last update</acronym></span>
+      <span class="field-value" date-format>{{record.updatedAt}}</span>
+    </div>
+   <div class="field-item">
+      <span class="field-label"><acronym title="createdAt">Created</acronym></span>
+      <span class="field-value" date-format>{{record.createdAt}}</span>
+    </div>
+  </div>
+  <div ng-transclude></div>
+</div>

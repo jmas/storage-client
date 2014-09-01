@@ -186,6 +186,27 @@ class Storage
   /**
    *
    */
+  public function removeCollection($collectionName)
+  {
+    foreach ($this->schema as $i => $collection) {
+      if ($collection['name'] == $collectionName) {
+        $sql = "DROP TABLE {$collection['name']}";
+        $sth = $this->connection->prepare($sql);
+        
+        array_splice($this->schema, $i, 1);
+
+        if ($sth->execute() !== false) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   *
+   */
   public function getFieldSchema($name, $collectionName=null)
   {
     $collectionName = ($collectionName ? $collectionName: $this->collectionName);
@@ -529,7 +550,7 @@ class Storage
 
       $sqlWhere = ' WHERE ' . $this->buildFilterSql($filter) . ' '; //implode(' AND ', $and);
     }
-    
+
     if ($limit !== null) {
       $sqlLimit = " LIMIT {$limit} ". ($skip ? " OFFSET {$skip} ": '');
     }
@@ -662,34 +683,37 @@ class Storage
           }
 
           $sqlIds = array_unique($sqlIds);
+          $sqlIds = array_filter($sqlIds);
 
           $sqlLimit = '';
 
-          $sqlWhere = ' WHERE ' . (count($sqlIds) === 1 ? ' id=' . $sqlIds[0] . ' ': ' id IN(' . implode(', ', $sqlIds) . ') ');
+          if (! empty($sqlIds)) {
+            $sqlWhere = ' WHERE ' . (count($sqlIds) === 1 ? ' id=' . $sqlIds[0] . ' ': ' id IN(' . implode(', ', $sqlIds) . ') ');
 
-          if (count($sqlIds) === 1) {
-            $sqlLimit = ' LIMIT 1 ';
-          }
-
-          $sql = "SELECT {$sqlColumns} FROM {$populateCollectionName} {$sqlWhere} {$sqlLimit}";
-
-          $sth = $this->connection->prepare($sql);
-
-          try {
-            if ($sth->execute() === false) {
-              continue;
+            if (count($sqlIds) === 1) {
+              $sqlLimit = ' LIMIT 1 ';
             }
-          } catch (PDOException $e) {
-            throw new Exception($e->getMessage());
-          }
 
-          $columnResults = $sth->fetchAll(PDO::FETCH_ASSOC);
+            $sql = "SELECT {$sqlColumns} FROM {$populateCollectionName} {$sqlWhere} {$sqlLimit}";
+            
+            $sth = $this->connection->prepare($sql);
 
-          foreach ($results as $i=>$result) {
-            foreach ($columnResults as $columnResult) {
-              if (isset($result[$column]) && $result[$column] == $columnResult['id']) {
-                $results[$i][$column] = $columnResult;
-                break;
+            try {
+              if ($sth->execute() === false) {
+                continue;
+              }
+            } catch (PDOException $e) {
+              throw new Exception($e->getMessage());
+            }
+
+            $columnResults = $sth->fetchAll(PDO::FETCH_ASSOC);
+
+            foreach ($results as $i=>$result) {
+              foreach ($columnResults as $columnResult) {
+                if (isset($result[$column]) && $result[$column] == $columnResult['id']) {
+                  $results[$i][$column] = $columnResult;
+                  break;
+                }
               }
             }
           }

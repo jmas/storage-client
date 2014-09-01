@@ -39,7 +39,9 @@ $app->response->headers->set('Content-Type', 'application/json');
 // get all collections
 $app->get('/collections', function() use ($app) {
   $schema = $app->storage->getSchema();
-  $app->response->write(json_encode($schema));
+  $app->response->write(json_encode([
+    'result'=>$schema,
+  ]));
 });
 
 // update collections order
@@ -78,8 +80,20 @@ $app->post('/collections/:name', function ($name) use ($app) {
 });
 
 // delete collection
-$app->delete('/collections/:name', function() use ($app) {
+$app->delete('/collections/:name', function($name) use ($app) {
+  $result = false;
 
+  if ($app->storage->removeCollection($name)) {
+    $schema = $app->storage->getSchema();
+
+    file_put_contents('./data/schema.json', json_encode($schema, JSON_PRETTY_PRINT));
+
+    $result = true;
+  }
+
+  $app->response->write(json_encode([
+    'result' => $result,
+  ]));
 });
 
 // get collection entries
@@ -120,7 +134,11 @@ $app->get('/collections/:name/entries', function($name) use ($app) {
 
   $skipParam = $app->request->get('skip');
 
-  $entries->limit(15);
+  $limitParam = $app->request->get('limit');
+
+  if ($limitParam) {
+    $entries->limit($limitParam);
+  }
 
   if ($skipParam) {
     $entries->skip($skipParam);
@@ -154,7 +172,9 @@ $app->post('/collections/:name/entries', function($name) use ($app) {
   $result = $collection->save($data, true);
 
   if ($result !== false) {
-    $app->response->write(json_encode($result));
+    $app->response->write(json_encode([
+      'result' => $result
+    ]));
   }
 });
 
