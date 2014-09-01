@@ -72,7 +72,7 @@ app.directive('entry', function() {
       };
 
       $scope.viewEntries = function(field, entry) {
-        $rootScope.$emit('entry:view', field, entry);
+        $rootScope.$emit('entryBrowser:view', field, entry);
       };
     },
     templateUrl: 'partials/entry.html'
@@ -97,7 +97,7 @@ app.directive('entryField', function() {
       };
 
       $scope.selectEntry = function(field, entry) {
-        $rootScope.$emit('entry:select', field, entry);
+        $rootScope.$emit('entryBrowser:select', field, entry);
       };
     }
   };
@@ -593,7 +593,7 @@ app.controller('CollectionEditCtrl', function($scope, $routeParams, $location, A
 app.controller('EntriesCtrl', function($scope, $rootScope, $routeParams, AppService, EntriesService, flash) {
   $scope.collectionName = $routeParams.collectionName;
 
-  $scope.collection = [];
+  $scope.collection = {};
 
   $scope.skip = null;
   $scope.limit = null || 25;
@@ -717,7 +717,7 @@ app.controller('EntryEditDialogCtrl', function($scope, $rootScope, EntriesServic
 });
 
 
-app.controller('EntrySelectDialogCtrl', function($scope, $rootScope, EntriesService) {
+app.controller('EntryBrowserDialogCtrl', function($scope, $rootScope, EntriesService) {
   $scope.collectionName = null;
 
   $scope.title = null;
@@ -835,7 +835,7 @@ app.controller('EntrySelectDialogCtrl', function($scope, $rootScope, EntriesServ
     }
   };
 
-  $rootScope.$on('entry:select', function(event, field, entry) {
+  $rootScope.$on('entryBrowser:select', function(event, field, entry) {
     $scope.collectionName = field.collection;
     $scope.active = true;
     $scope.entry = entry;
@@ -845,10 +845,10 @@ app.controller('EntrySelectDialogCtrl', function($scope, $rootScope, EntriesServ
     $scope.isView = false;
     $scope.title = 'Select Entry';
 
-    updateActiveItems();
+    refreshEntries();
   });
 
-  $rootScope.$on('entry:view', function(event, field, entry) {
+  $rootScope.$on('entryBrowser:view', function(event, field, entry) {
     var fields = EntriesService.getCollectionFields(field.collection);
 
     $scope.collectionName = field.collection;
