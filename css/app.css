@@ -633,42 +633,42 @@ textarea:focus {
   padding: 5px 1%;
 }
 
-.entry-field-list .item-wysiwyg .btn-toolbar {
+.btn-toolbar {
   overflow: hidden;
 }
 
-.entry-field-list .item-wysiwyg .btn-group .btn {
+.btn-group .btn {
   border-radius: 0;
   margin-bottom: 5px;
 }
 
-.entry-field-list .item-wysiwyg .btn-group .btn:first-child {
+.btn-group .btn:first-child {
   border-radius: 5px 0 0 5px;
 }
 
-.entry-field-list .item-wysiwyg .btn-group .btn:last-child {
+.btn-group .btn:last-child {
   border-radius: 0 5px 5px 0;
 }
 
-.entry-field-list .item-wysiwyg .btn-group {
+.btn-group {
   float: left;
   margin-right: 5px;
 }
 
-.entry-field-list .item-wysiwyg .ta-editor {
+.ta-editor {
   border: 1px solid #ddd;
   border-radius: 3px;
   background-color: #fff;
 }
 
-.entry-field-list .item-wysiwyg .ta-editor.ta-html {
+.ta-editor.ta-html {
   width: 98%;
   padding: 5px 1%;
   background-color: #6E6E6E;
   color: #fff;
 }
 
-.entry-field-list .item-wysiwyg .ta-editor:focus {
+.ta-editor:focus {
   outline: none;
   border-color: #CEE3F6;
 }
@@ -678,7 +678,7 @@ textarea:focus {
   border-color: #CEE3F6;
 }
 
-.entry-field-list .item-wysiwyg .ta-editor div[contenteditable]:focus {
+.ta-editor div[contenteditable]:focus {
   outline: none;
 }
 
