@@ -4,7 +4,7 @@
   <a class="btn deselect-all-btn" ng-click="deselectAll()" ng-class="{active: isSelected()}">Deselect</a>
   <a class="btn danger remove-btn" ng-click="removeSelected()" ng-class="{active: isSelected()}">Remove Selected</a>
 
-  <div class="option-filter" ng-if="collection.entries.length > 0">
+  <div class="option-filter">
     <input class="option-filter-input" type="text" placeholder="Filter" ng-model="filter" debounce="500" autofocus />
   </div>
 </div>
