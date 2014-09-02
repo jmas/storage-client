@@ -1,5 +1,5 @@
 <div class="entry-field">
-  <label class="entry-field-label">{{field.label || field.name}}</label>
+  <label class="entry-field-label" ng-class="{required: field.required}">{{field.label || field.name}}</label>
 
   <div class="entry-field-actions" ng-if="field.type == 'collectionOne' || field.type == 'collectionMany'">
     <button class="btn small" ng-click="selectEntry(field, entry)">Select</button>

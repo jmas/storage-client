@@ -914,6 +914,11 @@ textarea:focus {
 .entry-form .entry-field-label {
   display: block;
   margin-bottom: 5px;
+  font-size: .9em;
+}
+
+.entry-form .entry-field-label.required {
+  font-weight: bold;
 }
 
 .entry-form .entry-field-actions {
