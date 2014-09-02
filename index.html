@@ -36,6 +36,10 @@
           <div class="buttons-left">
             <button class="btn simple" ng-click="cancel()">{{editingItems.length > 1 ? 'Back': 'Cancel'}}</button>
           </div>
+
+          <div class="entry-date">
+            Created {{humanizeDate(record.createdAt)}} (updated {{humanizeDate(record.updatedAt)}})
+          </div>
         </div>
       </ng-dialog>
     </div>

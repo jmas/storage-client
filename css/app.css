@@ -499,6 +499,12 @@ textarea:focus {
   background-color: #EFF8FB;
 }
 
+.entry .entry-date {
+  line-height: 30px;
+  font-size: .8em;
+  color: silver;
+}
+
 .entry-list .field-item,
 .entries .field-item {
   overflow: hidden;
@@ -546,6 +552,7 @@ textarea:focus {
   position: absolute;
   right: 15px;
   top: 15px;
+  float: right;
   font-size: .9em;
   line-height: 30px;
 }
@@ -779,6 +786,7 @@ textarea:focus {
   overflow: hidden;
   margin: 60px auto;
   border-radius: 3px;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.1);
 }
 
 .dialog-content {
@@ -920,6 +928,12 @@ textarea:focus {
 
 .entry-form .entry-field-actions a {
   margin-right: 15px;
+}
+
+.entry-form .entry-date {
+  line-height: 30px;
+  font-size: .8em;
+  color: silver;
 }
 
 .entry-select-filter {

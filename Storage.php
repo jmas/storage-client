@@ -757,9 +757,11 @@ class Storage
         $sqlParams[$placeholder] = (is_array($value) ? $value['id']: $value);
       }
 
+      array_push($sqlColumnsAndValues, ' updatedAt=NOW() ');
+
       $sqlColumnsAndValues = implode(', ', $sqlColumnsAndValues);
 
-      $sql = "UPDATE {$sqlTable} SET {$sqlColumnsAndValues}, updatedAt=NOW() {$sqlWhere}";
+      $sql = "UPDATE {$sqlTable} SET {$sqlColumnsAndValues} {$sqlWhere}";
     } else {
       $sqlColumns = [];
 
@@ -776,13 +778,20 @@ class Storage
         $sqlParams[$placeholder] = (is_array($value) ? $value['id']: $value);
       }
 
-      $sqlValues = implode(', ', array_keys($sqlParams));
+      array_push($sqlColumns, 'createdAt');
+      array_push($sqlColumns, 'updatedAt');
+
+      $sqlValues = array_keys($sqlParams);
+
+      array_push($sqlValues, 'NOW()');
+      array_push($sqlValues, 'NOW()');
 
       $sqlColumns = implode(', ', $sqlColumns);
+      $sqlValues = implode(', ', $sqlValues);
 
-      $sql = "INSERT INTO {$sqlTable}({$sqlColumns}, createdAt, updatedAt) VALUES({$sqlValues}, NOW(), NOW())";
+      $sql = "INSERT INTO {$sqlTable}({$sqlColumns}) VALUES({$sqlValues})";
     }
-
+    
     $sth = $this->connection->prepare($sql);
 
     if ($sth->execute($sqlParams) === false) {

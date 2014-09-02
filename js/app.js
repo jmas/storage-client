@@ -121,7 +121,14 @@ app.directive('ngDialog', function() {
     restrict: 'E',
     transclude: true,
     scope: true,
-    templateUrl: 'partials/dialog.html'
+    templateUrl: 'partials/dialog.html',
+    controller: function($scope, $element) {
+      $scope.$watch('active', function(value) {
+        if (value === true) {
+          $element[0].querySelector('.dialog').style.top = document.getElementsByTagName('BODY')[0].scrollTop + 'px';
+        }
+      });
+    }
   };
 });
 
@@ -136,6 +143,7 @@ app.factory("AppService", function() {
     {
       app.breadcrumbs = breadcrumbs;
     },
+
     getBreadcrumbs: function()
     {
       return app.breadcrumbs;
@@ -370,13 +378,18 @@ app.factory('EntriesService', function($http) {
       }
     },
 
-    removeCollection: function(collectionName) { 
-      return $http({method: 'DELETE', url: baseUrl + '/collections/' + collectionName})
-        .success(function(d) {
-          if (typeof d.error == 'undefined') {
-            for (var i=0,len=data.result.collections.length; i<len; i++) {
-              if (data.result.collections[i].name == collectionName) {
-                data.collections.splice(i, 1);
+    removeCollection: function(collectionName) {
+      var me = this;
+
+      return $http({
+        method: 'DELETE',
+        url: baseUrl + '/collections/' + collectionName
+      })
+        .success(function(response) {
+          if (typeof response.error == 'undefined') {
+            for (var i=0,len=me.collections.length; i<len; i++) {
+              if (me.collections[i].name == collectionName) {
+                me.collections.splice(i, 1);
                 break;
               }
             }
@@ -682,6 +695,10 @@ app.controller('EntryEditDialogCtrl', function($scope, $rootScope, EntriesServic
     } else {
       $scope.active = false;
     }
+  };
+
+  $scope.humanizeDate = function(date) {
+    return moment(date).fromNow();
   };
 
   $rootScope.$on('entry:edit', function(event, collectionName, entry) {

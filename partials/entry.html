@@ -6,13 +6,8 @@
       <span class="field-value" ng-if="field.collection && record[field.name] && record[field.name] != 0"><a ng-click="viewEntries(field, record)">View ({{field.type == 'collectionOne' ? 1: record[field.name].length}})</a></span>
       <span class="field-value" ng-if="field.collection && (! record[field.name] || record[field.name] == 0)"></span>
     </div>
-    <div class="field-item">
-      <span class="field-label"><acronym title="updatedAt">Last update</acronym></span>
-      <span class="field-value">{{humanizeDate(record.updatedAt)}}</span>
-    </div>
-   <div class="field-item">
-      <span class="field-label"><acronym title="createdAt">Created</acronym></span>
-      <span class="field-value">{{humanizeDate(record.createdAt)}}</span>
+    <div class="entry-date">
+      Created {{humanizeDate(record.createdAt)}} (updated {{humanizeDate(record.updatedAt)}})
     </div>
   </div>
   <div ng-transclude></div>
