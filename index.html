@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
     <title>app</title>
     <link rel="stylesheet" href="bower_components/angular-loading-bar/build/loading-bar.min.css" />
-    <link rel="stylesheet" type="text/css" href="css/app.css" />
     <link rel="stylesheet" href="bower_components/angular-hotkeys/build/hotkeys.min.css" />
+    <link rel="stylesheet" type="text/css" href="css/app.css" />
   </head>
   <body>
 
@@ -25,44 +25,8 @@
       <entry-browser-dialog></entry-browser-dialog>
     </div>
 
-    <div ng-controller="EntryEditDialogCtrl">
-      <ng-dialog>
-        <div class="entry-form">
-          <entry-field ng-repeat="field in editing.fields" field="field" entry="editing.entry"></entry-field>
-
-          <div class="buttons-right">
-            <button class="btn primary" ng-click="save()">{{editingItems.length > 1 ? 'Save and Back': 'Save'}}</button>
-          </div>
-          <div class="buttons-left">
-            <button class="btn simple" ng-click="cancel()">{{editingItems.length > 1 ? 'Back': 'Cancel'}}</button>
-          </div>
-
-          <div class="entry-date">
-            Created {{humanizeDate(record.createdAt)}} (updated {{humanizeDate(record.updatedAt)}})
-          </div>
-        </div>
-      </ng-dialog>
-    </div>
-
-    <div ng-controller="EntryBrowserDialogCtrl">
-      <ng-dialog>
-        <div class="entry-select-filter" ng-if="! isView">
-          <input type="text" placeholder="Filter" ng-model="params.filter" debounce="500" autofocus />
-        </div>
-        <div class="entries">
-          <entry ng-repeat="record in collection.entries" fields="collection.fields" record="record" on-active="onActive"></entry>
-        </div>
-        <div class="load-more-trigger" ng-if="! isView">
-          <a ng-click="loadMoreEntries()">Load More</a>
-        </div>
-        <div class="buttons-right" ng-if="! isView">
-          <button class="btn primary" ng-click="select()">Select</button>
-        </div>
-        <div class="buttons-left">
-          <button class="btn simple" ng-click="cancel()">Cancel</button>
-        </div>
-      </ng-dialog>
-    </div>
+    <ng-include src="'partials/entry-edit-dialog.html'"></ng-include>
+    <ng-include src="'partials/entry-browser-dialog.html'"></ng-include>
 
   </body>
   <script src="bower_components/hammerjs/hammer.min.js"></script>

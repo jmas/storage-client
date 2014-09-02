@@ -116,7 +116,7 @@ app.directive('field', function() {
   };
 });
 
-app.directive('ngDialog', function() {
+app.directive('modalDialog', function() {
   return {
     restrict: 'E',
     transclude: true,
@@ -128,6 +128,42 @@ app.directive('ngDialog', function() {
           $element[0].querySelector('.dialog').style.top = document.getElementsByTagName('BODY')[0].scrollTop + 'px';
         }
       });
+    }
+  };
+});
+
+app.directive('shortList', function() {
+  return {
+    restrict: 'A',
+    scope: {
+      list: '=shortList'
+    },
+    transclude: true,
+    template: '<div ng-transclude></div><div class="view-all" ng-if="items.length > 1 && isViewAllShowed"><a ng-click="viewAll()">View All ({{items.length}})</a></div>',
+    controller: function($scope, $element) {
+      $scope.items = [];
+      $scope.isViewAllShowed = false;
+
+      $scope.$watch('list', function(items) {
+        for (var i=0,len=items.length; i<len; i++) {
+          if (i>1) {
+            items[i]._displayed = false;
+          } else {
+            items[i]._displayed = true;
+          }
+        }
+
+        $scope.items = items;
+        $scope.isViewAllShowed = true;
+      });
+
+      $scope.viewAll = function() {
+        for (var i=0,len=$scope.items.length; i<len; i++) {
+          $scope.items[i]._displayed = true;
+        }
+
+        $scope.isViewAllShowed = false;
+      };
     }
   };
 });

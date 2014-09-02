@@ -474,6 +474,14 @@ textarea:focus {
   min-height: 30px;
 }
 
+.entries .view-all {
+  background-color: #eee;
+  padding: 5px;
+  font-size: .75em;
+  margin-top:-2px;
+  border-radius: 0 0 3px 3px;
+}
+
 .entry-list img,
 .entries img {
   vertical-align: middle;

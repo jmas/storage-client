@@ -47,10 +47,14 @@
       <input type="text" ng-model="entry[field.name]" />
     </div>
     <div ng-switch-when="collectionOne">
-      <entry fields="getCollectionFields(field.collection)" record="entry[field.name]" ng-if="entry[field.name]"></entry>
+      <div class="entries">
+        <entry fields="getCollectionFields(field.collection)" record="entry[field.name]" ng-if="entry[field.name]"></entry>
+      </div>
     </div>
     <div ng-switch-when="collectionMany">
-      <entry ng-repeat="record in entry[field.name]" fields="getCollectionFields(field.collection)" record="record"></entry>
+      <div class="entries" short-list="entry[field.name]">
+        <entry ng-repeat="record in entry[field.name]" fields="getCollectionFields(field.collection)" record="record" ng-if="record._displayed"></entry>
+      </div>
     </div>
   </div>
 </div>

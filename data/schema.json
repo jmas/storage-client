@@ -6,26 +6,16 @@
                 "name": "name",
                 "sort": 1,
                 "type": "text",
-                "label": "Name",
+                "label": "\u0418\u043c\u044f",
                 "defaultValue": "",
                 "required": false,
                 "displayed": true
             },
             {
-                "name": "posts",
-                "sort": 1,
-                "type": "collectionMany",
-                "label": "Posts",
-                "defaultValue": "",
-                "required": false,
-                "displayed": true,
-                "collection": "post"
-            },
-            {
                 "name": "email",
                 "sort": 1,
                 "type": "text",
-                "label": "E-mail",
+                "label": "\u042d\u043b. \u043f\u043e\u0447\u0442\u0430",
                 "defaultValue": "",
                 "required": true,
                 "displayed": true
@@ -34,10 +24,20 @@
                 "name": "password",
                 "sort": 1,
                 "type": "password",
-                "label": "Password",
+                "label": "\u041f\u0430\u0440\u043e\u043b\u044c",
                 "defaultValue": "",
                 "required": true,
                 "displayed": false
+            },
+            {
+                "name": "posts",
+                "sort": 1,
+                "type": "collectionMany",
+                "label": "\u0417\u0430\u043f\u0438\u0441\u0438",
+                "defaultValue": "",
+                "required": false,
+                "displayed": true,
+                "collection": "post"
             }
         ],
         "sort": "createdAt",
