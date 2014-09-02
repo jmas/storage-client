@@ -10,6 +10,10 @@ body {
   color: #2E2E2E;
 }
 
+.hiden {
+  display: none;
+}
+
 [ng-repeat-reorder].dragging{
   z-index: 11;
   position: absolute;
