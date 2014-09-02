@@ -145,6 +145,10 @@ app.directive('shortList', function() {
       $scope.isViewAllShowed = false;
 
       $scope.$watch('list', function(items) {
+        if (! items) {
+          return;
+        }
+
         for (var i=0,len=items.length; i<len; i++) {
           if (i > 1) {
             items[i]._displayed = false;
