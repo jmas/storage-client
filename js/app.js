@@ -785,12 +785,11 @@ app.controller('EntryBrowserDialogCtrl', function($scope, $rootScope, EntriesSer
   $scope.collection = null;
   $scope.entry = null;
   $scope.field = null;
-  $scope.activeItems = [];
 
   $scope.params = {
     skip: null,
     limit: null || 10,
-    filter: null
+    filter: ''
   };
 
   var refreshEntries = function() {
@@ -836,7 +835,16 @@ app.controller('EntryBrowserDialogCtrl', function($scope, $rootScope, EntriesSer
     }
   };
 
-  $scope.$watch('params.filter + params.skip + collectionName', refreshEntries);
+  $scope.$watch('params.filter', refreshEntries);
+
+  $scope.clear = function() {
+    $scope.collectionName = null;
+    $scope.active = false;
+    $scope.entry = null;
+    $scope.field = null;
+    $scope.params.filter = '';
+    $scope.isView = false;
+  };
 
   $scope.select = function() {
     if ($scope.field.type == 'collectionOne') {
@@ -860,15 +868,16 @@ app.controller('EntryBrowserDialogCtrl', function($scope, $rootScope, EntriesSer
       $scope.entry[$scope.field.name] = items;
     }
 
-    $scope.active = false;
+    $scope.clear();
   };
 
   $scope.cancel = function() {
-    $scope.active = false;
+    $scope.clear();
   };
 
   $scope.loadMoreEntries = function() {
     $scope.params.skip = $scope.params.skip + $scope.params.limit;
+    refreshEntries();
   };
 
   $scope.onActive = function(entry, isActive) {
@@ -898,8 +907,7 @@ app.controller('EntryBrowserDialogCtrl', function($scope, $rootScope, EntriesSer
     $scope.active = true;
     $scope.entry = entry;
     $scope.field = field;
-    $scope.params.filter = null;
-    $scope.activeItems.splice(0, $scope.activeItems.length - 1);
+    $scope.params.filter = '';
     $scope.isView = false;
     $scope.title = 'Select Entry';
 
@@ -918,8 +926,7 @@ app.controller('EntryBrowserDialogCtrl', function($scope, $rootScope, EntriesSer
     $scope.active = true;
     $scope.entry = entry[field.name];
     $scope.field = field;
-    $scope.params.filter = null;
-    $scope.activeItems.splice(0, $scope.activeItems.length - 1);
+    $scope.params.filter = '';
     $scope.isView = true;
     $scope.title = 'View Entries';
 

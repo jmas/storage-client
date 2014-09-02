@@ -170,7 +170,7 @@ class Storage
     if (! $isCollectionExists) {
       $this->schema[] = $collectionSchema;
     }
-
+    
     // execute batch sql
     foreach ($batchSql as $sql) {
       $sth = $this->connection->prepare($sql);
@@ -385,46 +385,6 @@ class Storage
     $sqlParams = null;
 
     if (! empty($filter)) {
-      // $sqlParams = [];
-      // $and = [];
-
-      // foreach ($filter as $column=>$value) {
-      //   if (is_array($value) && $this->isAssocArray($value)) {
-      //     if (isset($value['from'])) {
-      //       $placeholder = ':' . $column . '_' . uniqid();
-      //       $and[] = " {$column} >= {$placeholder} ";
-      //       $sqlParams[$placeholder] = $value['from'];
-      //     }
-
-      //     if (isset($value['to'])) {
-      //       $placeholder = ':' . $column . '_' . uniqid();
-      //       $and[] = " {$column} <= {$placeholder} ";
-      //       $sqlParams[$placeholder] = $value['to'];
-      //     }
-
-      //     if (isset($value['like'])) {
-      //       $placeholder = ':' . $column . '_' . uniqid();
-      //       $and[] = " {$column} LIKE {$placeholder} ";
-      //       $sqlParams[$placeholder] = $value['like'];
-      //     }
-      //   } else if (is_array($value)) {
-      //     $or = [];
-
-      //     foreach ($value as $orColumn=>$orValue) {
-      //       $placeholder = ':' . $column . '_' . uniqid();
-      //       $or[] = " {$column}={$placeholder} ";
-      //       $sqlParams[$placeholder] = $orValue;
-      //     }
-
-      //     $and[] = ' (' . implode(' OR ', $or) . ') ';
-      //   } else {
-      //     $placeholder = ':' . $column . '_' . uniqid();
-      //     $and[] = " {$column}={$placeholder} ";
-      //     $sqlParams[$placeholder] = $value;
-      //   }
-      // }
-
-      // $sqlWhere = ' WHERE ' . implode(' AND ', $and);
       $sqlWhere = ' WHERE ' . $this->buildFilterSql($filter) . ' ';
     }
 
@@ -507,47 +467,6 @@ class Storage
     }
 
     if (! empty($filter)) {
-      // $sqlParams = [];
-      // $and = [];
-
-      // foreach ($filter as $column=>$value) {
-      //   if (is_array($value) && $this->isAssocArray($value)) {
-      //     $conditions = [];
-
-      //     if (isset($value['from'])) {
-      //       $placeholder = ':' . $column . '_' . uniqid();
-      //       $conditions[] = " {$column} >= {$placeholder} ";
-      //       $sqlParams[$placeholder] = $value['from'];
-      //     }
-
-      //     if (isset($value['to'])) {
-      //       $placeholder = ':' . $column . '_' . uniqid();
-      //       $conditions[] = " {$column} <= {$placeholder} ";
-      //       $sqlParams[$placeholder] = $value['to'];
-      //     }
-
-      //     if (isset($value['like'])) {
-      //       $placeholder = ':' . $column . '_' . uniqid();
-      //       $conditions[] = " {$column} LIKE {$placeholder} ";
-      //       $sqlParams[$placeholder] = $value['like'];
-      //     }
-      //   } else if (is_array($value)) {
-      //     $or = [];
-
-      //     foreach ($value as $orColumn=>$orValue) {
-      //       $placeholder = ':' . $column . '_' . uniqid();
-      //       $or[] = " {$column} = {$placeholder} ";
-      //       $sqlParams[$placeholder] = $orValue;
-      //     }
-
-      //     $and[] = ' (' . implode(' OR ', $or) . ') ';
-      //   } else {
-      //     $placeholder = ':' . $column . '_' . uniqid();
-      //     $and[] = " {$column} = {$placeholder} ";
-      //     $sqlParams[$placeholder] = $value;
-      //   }
-      // }
-
       $sqlWhere = ' WHERE ' . $this->buildFilterSql($filter) . ' '; //implode(' AND ', $and);
     }
 
@@ -647,14 +566,14 @@ class Storage
 
           $sqlIds = implode(', ', $sqlIds);
           $sqlSecondTable = $populateCollectionName;
-          $sqlFirstTable = $this->makeJunctionTableName($collectionName, $sqlSecondTable); // $collectionName . ucfirst($sqlSecondTable);
+          $sqlFirstTable = $this->makeJunctionTableName($collectionName, $sqlSecondTable);
           $sqlColumns = " t1.{$collectionName}Id, t2.* ";
           $sqlJoinCondition = " t1.{$sqlSecondTable}Id=t2.id ";
           $sqlWhere = " WHERE t1.{$collectionName}Id IN({$sqlIds}) ";
           
           // many to many
           $sql = "SELECT {$sqlColumns} FROM {$sqlFirstTable} AS t1 LEFT JOIN {$sqlSecondTable} AS t2 ON {$sqlJoinCondition} {$sqlWhere}";
-          // var_dump($sql); die;
+          
           $sth = $this->connection->prepare($sql);
 
           try {
