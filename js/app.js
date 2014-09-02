@@ -273,8 +273,8 @@ app.factory('EntriesService', function($http) {
         data: entriesIds,
         url: baseUrl + '/collections/' + collectionName + '/entries'
       })
-        .success(function(result) {
-          if (typeof data.error === 'undefined') {
+        .success(function(response) {
+          if (typeof response.error === 'undefined') {
             for (var i=0,leni=entriesIds.length; i<leni; i++) {
               for (var j=0,lenj=collection.entries.length; j<lenj; j++) {
                 if (entriesIds.indexOf(collection.entries[j].id) !== -1) {
@@ -425,8 +425,8 @@ app.factory('EntriesService', function($http) {
     {
       var collections = [];
 
-      for (var i=0,len=data.collections.length; i<len; i++) {
-        collections.push(data.collections[i].name);
+      for (var i=0,len=this.collections.length; i<len; i++) {
+        collections.push(this.collections[i].name);
       }
 
       return $http({
@@ -586,7 +586,7 @@ app.controller('CollectionEditCtrl', function($scope, $routeParams, $location, A
   AppService.setBreadcrumbs([{
     path: 'collections',
     name: 'Collections'
-  }, $scope.collection.name ? 'Editing ' + ' ' + ($scope.collection.label || $scope.collection.name): 'Creating' ]);
+  }, $scope.collection.name ? 'Edit' + ' ' + ($scope.collection.label || $scope.collection.name): 'Create' ]);
 });
 
 
@@ -605,6 +605,11 @@ app.controller('EntriesCtrl', function($scope, $rootScope, $routeParams, AppServ
     EntriesService.loadEntries($scope.collectionName, $scope.skip, $scope.limit, $scope.filter)
       .then(function() {
         $scope.collection = EntriesService.getCollection($scope.collectionName);
+
+        AppService.setBreadcrumbs([{
+          path: 'collections',
+          name: 'Collections'
+        }, $scope.collection.label || $scope.collection.name]);
       });
   });
 
@@ -685,7 +690,7 @@ app.controller('EntryEditDialogCtrl', function($scope, $rootScope, EntriesServic
     }
 
     $scope.editingItems.push({
-      title: (typeof entry.id === 'undefined' ? 'Create Entry': 'Edit Entry'),
+      title: (typeof entry.id === 'undefined' || entry.id === null ? 'Create Entry': 'Edit Entry'),
       collectionName: collectionName,
       entry: entry,
       fields: EntriesService.getCollectionFields(collectionName),

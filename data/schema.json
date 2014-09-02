@@ -12,6 +12,16 @@
                 "displayed": true
             },
             {
+                "name": "posts",
+                "sort": 1,
+                "type": "collectionMany",
+                "label": "Posts",
+                "defaultValue": "",
+                "required": false,
+                "displayed": true,
+                "collection": "post"
+            },
+            {
                 "name": "email",
                 "sort": 1,
                 "type": "text",
@@ -28,25 +38,15 @@
                 "defaultValue": "",
                 "required": true,
                 "displayed": false
-            },
-            {
-                "name": "posts",
-                "sort": 1,
-                "type": "collectionMany",
-                "label": "Posts",
-                "defaultValue": "",
-                "required": false,
-                "displayed": true,
-                "collection": "post"
             }
         ],
         "sort": "createdAt",
         "sortType": "-1",
-        "label": "Users"
+        "label": "\u041f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u0438"
     },
     {
         "name": "post",
-        "label": "Post",
+        "label": "\u0417\u0430\u043f\u0438\u0441\u0438",
         "fields": [
             {
                 "name": "caption",
