@@ -128,12 +128,6 @@ $app->get('/collections/:name/entries', function($name) use ($app) {
      $entries->filter($filters);
   }
 
-  // $ids = $app->request->get('ids');
-
-  // if ($ids) {
-  //   $entries->filter([ 'id' => $ids ]);
-  // }
-
   $skipParam = $app->request->get('skip');
 
   $limitParam = $app->request->get('limit');
@@ -192,14 +186,12 @@ $app->delete('/collections/:name/entries', function($name) use ($app) {
 });
 
 // test
-$app->get('/test', function() use ($app) {
-  // $result = $app->storage->collection('user')->filter(['id'=>['from'=>2, 'to'=>2]])->all();
+// $app->get('/test', function() use ($app) {
+//   $result = $app->storage->collection('user')->filter([
+//     'id'=>['from'=>2, 'to'=>2],
+//   ])->all();
 
-  $result = $app->storage->collection('user')->filter([
-    'id'=>['from'=>2, 'to'=>2],
-  ])->all();
-
-  $app->response->write(json_encode($result));
-});
+//   $app->response->write(json_encode($result));
+// });
 
 $app->run();
