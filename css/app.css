@@ -512,7 +512,6 @@ textarea:focus {
 }
 
 .entry .entry-date {
-  line-height: 30px;
   font-size: .8em;
   color: silver;
 }
@@ -948,7 +947,6 @@ textarea:focus {
 }
 
 .entry-form .entry-date {
-  line-height: 30px;
   font-size: .8em;
   color: silver;
 }
@@ -961,4 +959,31 @@ textarea:focus {
   padding-right: 1%;
   padding-left: 1%;
   width: 98%;
+}
+
+@media (max-width: 500px) {
+  #app {
+    padding: 15px 0;
+  }
+
+  #breadcrumbs {
+    padding: 0 15px;
+    margin-bottom: 15px;
+  }
+
+  .dialog-inside {
+    margin-top:0;
+    margin-bottom:0;
+  }
+
+  .option-filter {
+    float: none;
+    margin-top: 15px;
+    margin-bottom: 15px;
+  }
+
+  .collections-options,
+  .entry-list-options {
+    padding: 0 15px;
+  }
 }
