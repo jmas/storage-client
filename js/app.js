@@ -19,7 +19,7 @@ app.config(function($routeProvider, $locationProvider, cfpLoadingBarProvider) {
 
   $routeProvider
     .when('/collections', {
-      templateUrl: 'partials/collections-list.html',
+      templateUrl: 'partials/collections.html',
       controller: 'CollectionsCtrl'
     })
     .when('/collections/:collectionName/edit', {
