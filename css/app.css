@@ -470,7 +470,7 @@ textarea:focus {
   border: 1px solid #eee;
   background-color: #fff;
   margin-top: -1px;
-  padding: 15px;
+  padding: 10px 15px;
   min-height: 30px;
 }
 

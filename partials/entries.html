@@ -1,11 +1,11 @@
 <div class="entry-list-options">
   <a ng-click="createEntry()" class="btn trusty">Create</a>
-  <a class="btn select-all-btn" ng-click="selectAll()" ng-class="{active: !isAllSelected()}">Select All</a>
+  <a class="btn select-all-btn" ng-click="selectAll()" ng-class="{active: !isAllSelected()}" ng-if="collection.entries.length > 0">Select All</a>
   <a class="btn deselect-all-btn" ng-click="deselectAll()" ng-class="{active: isSelected()}">Deselect</a>
   <a class="btn danger remove-btn" ng-click="removeSelected()" ng-class="{active: isSelected()}">Remove Selected</a>
 
-  <div class="option-filter">
-    <input class="option-filter-input" type="text" placeholder="Filter" ng-model="filter" debounce="500" hotkey="{'ctrl+f': focusFilter}" />
+  <div class="option-filter" ng-if="collection.entries.length > 0">
+    <input class="option-filter-input" type="text" placeholder="Filter" ng-model="filter" debounce="500" autofocus />
   </div>
 </div>
 

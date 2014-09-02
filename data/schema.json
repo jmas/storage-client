@@ -114,5 +114,22 @@
         ],
         "sort": null,
         "sortType": "-1"
+    },
+    {
+        "name": "test",
+        "label": "Test",
+        "fields": [
+            {
+                "name": "test",
+                "sort": 1,
+                "type": "text",
+                "label": "",
+                "defaultValue": "",
+                "required": false,
+                "displayed": true
+            }
+        ],
+        "sort": null,
+        "sortType": "-1"
     }
 ]
