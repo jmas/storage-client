@@ -139,14 +139,14 @@ app.directive('shortList', function() {
       list: '=shortList'
     },
     transclude: true,
-    template: '<div ng-transclude></div><div class="view-all" ng-if="items.length > 1 && isViewAllShowed"><a ng-click="viewAll()">View All ({{items.length}})</a></div>',
+    template: '<div ng-transclude></div><div class="view-all" ng-if="items.length > 2 && isViewAllShowed"><a ng-click="viewAll()">View All ({{items.length}})</a></div>',
     controller: function($scope, $element) {
       $scope.items = [];
       $scope.isViewAllShowed = false;
 
       $scope.$watch('list', function(items) {
         for (var i=0,len=items.length; i<len; i++) {
-          if (i>1) {
+          if (i > 1) {
             items[i]._displayed = false;
           } else {
             items[i]._displayed = true;
