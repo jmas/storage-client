@@ -706,7 +706,7 @@ app.controller('EntryEditDialogCtrl', function($scope, $rootScope, EntriesServic
           if ($scope.editing.targetField.type == 'collectionOne') {
             $scope.editing.targetEntry[$scope.editing.targetField.name] = $scope.editing.entry;
           } else {
-            if (typeof $scope.editing.targetEntry[$scope.editing.targetField.name] === 'undefined') {
+            if (typeof $scope.editing.targetEntry[$scope.editing.targetField.name] === 'undefined' || $scope.editing.targetEntry[$scope.editing.targetField.name] === null) {
               $scope.editing.targetEntry[$scope.editing.targetField.name] = [];
             }
 
