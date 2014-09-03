@@ -1,27 +1,23 @@
 <div class="entry-list-options">
   <a ng-click="createEntry()" class="btn trusty" title="Create"><img src="images/plus-white.png" /></a>
-  <a class="btn select-all-btn" ng-click="selectAll()" ng-class="{active: !isAllSelected()}" ng-if="collection.entries.length > 0" title="Select All"><img src="images/selected-white.png" /></a>
-  <a class="btn deselect-all-btn" ng-click="deselectAll()" ng-class="{active: isSelected()}">Deselect</a>
-  <a class="btn danger remove-btn" ng-click="removeSelected()" ng-class="{active: isSelected()}">Remove Selected</a>
+  <a class="btn select-all-btn" ng-click="selectAll()" ng-class="{active: !isAllSelected()}" ng-if="collection.entries.length > 0" title="{{ 'Select All' | translate }}"><img src="images/selected-white.png" /></a>
+  <a class="btn deselect-all-btn" ng-click="deselectAll()" ng-class="{active: isSelected()}">{{ 'Deselect' | translate }}</a>
+  <a class="btn danger remove-btn" ng-click="removeSelected()" ng-class="{active: isSelected()}">{{ 'Remove Selected' | translate }}</a>
 
   <div class="option-filter">
-    <input class="option-filter-input" type="text" placeholder="Filter" ng-model="filter" debounce="500" />
+    <input class="option-filter-input" type="text" placeholder="{{ 'Filter' | translate }}" ng-model="filter" debounce="500" />
   </div>
 </div>
 
 <div class="entries">
   <entry ng-repeat="record in collection.entries" fields="collection.fields" record="record" ng-if="record.id">
     <div class="options">
-      <a ng-click="editEntry(record.id)">
-        <img src="images/edit.png" />
-      </a>
-      <a ng-click="removeEntry(record.id)">
-        <img src="images/remove.png" />
-      </a>
+      <a ng-click="editEntry(record.id)" title="{{ 'Edit' | translate }}"><img src="images/edit.png" /></a>
+      <a ng-click="removeEntry(record.id)" title="{{ 'Remove' | translate }}"><img src="images/remove.png" /></a>
     </div>
   </entry>
 </div>
 
 <div class="load-more-trigger" ng-if="collection.entries.length > 0">
-  <a ng-click="loadMoreEntries()">Load More</a>
+  <a ng-click="loadMoreEntries()">{{ 'Load More' | translate }}</a>
 </div>

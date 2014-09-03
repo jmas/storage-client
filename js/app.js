@@ -9,10 +9,11 @@ var app = a.module('app', [
   'ngRepeatReorder',
   'angular-loading-bar',
   'debounce',
-  'cfp.hotkeys'
+  'cfp.hotkeys',
+  'pascalprecht.translate'
 ]);
 
-app.config(function($routeProvider, $locationProvider, cfpLoadingBarProvider) {
+app.config(function($routeProvider, $locationProvider, $translateProvider, cfpLoadingBarProvider) {
   cfpLoadingBarProvider.includeSpinner = false;
 
   $locationProvider.html5Mode(false);
@@ -45,10 +46,16 @@ app.config(function($routeProvider, $locationProvider, cfpLoadingBarProvider) {
     .otherwise({
       redirectTo: '/collections'
     });
+
+    $translateProvider.useStaticFilesLoader({
+      prefix: 'languages/',
+      suffix: '.json'
+    });
 });
 
-app.run(function(EntriesService) {
+app.run(function($translate, EntriesService) {
   EntriesService.loadCollections();
+  $translate.use('ru');
 });
 
 app.directive('entry', function() {
@@ -139,7 +146,7 @@ app.directive('shortList', function() {
       list: '=shortList'
     },
     transclude: true,
-    template: '<div ng-transclude></div><div class="view-all" ng-if="items.length > 2 && isViewAllShowed"><a ng-click="viewAll()">View All ({{items.length}})</a></div>',
+    template: '<div ng-transclude></div><div class="view-all" ng-if="items.length > 2 && isViewAllShowed"><a ng-click="viewAll()">{{ "View All" | translate }} ({{items.length}})</a></div>',
     controller: function($scope, $element) {
       $scope.items = [];
       $scope.isViewAllShowed = false;
@@ -640,7 +647,7 @@ app.controller('CollectionEditCtrl', function($scope, $routeParams, $location, A
   AppService.setBreadcrumbs([{
     path: 'collections',
     name: 'Collections'
-  }, $scope.collection.name ? 'Edit' + ' ' + ($scope.collection.label || $scope.collection.name): 'Create' ]);
+  }, $scope.collection.name ? 'Setup': 'Create' ]);
 });
 
 

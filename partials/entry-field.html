@@ -2,9 +2,9 @@
   <label class="entry-field-label" title="{{field.name}}" ng-class="{required: field.required}">{{field.label || field.name}}</label>
 
   <div class="entry-field-actions" ng-if="field.type == 'collectionOne' || field.type == 'collectionMany'">
-    <button class="btn small" ng-click="selectEntry(field, entry)">Select</button>
-    <span class="or">or</span>
-    <button class="btn small" ng-click="createAndSelectEntry(field, entry)">Create</button>
+    <button class="btn small" ng-click="selectEntry(field, entry)">{{ 'Select' | translate }}</button>
+    <span class="or">{{ 'or' | translate }}</span>
+    <button class="btn small" ng-click="createAndSelectEntry(field, entry)">{{ 'Create' | translate }}</button>
   </div>
 
   <div ng-switch="field.type">

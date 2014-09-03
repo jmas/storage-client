@@ -54,7 +54,7 @@
                 "label": "\u0424\u043e\u043d",
                 "defaultValue": "",
                 "required": true,
-                "displayed": true
+                "displayed": false
             },
             {
                 "name": "user",
@@ -63,7 +63,7 @@
                 "label": "\u041f\u043e\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044c",
                 "defaultValue": "",
                 "required": true,
-                "displayed": true,
+                "displayed": false,
                 "collection": "user"
             },
             {
@@ -82,7 +82,7 @@
                 "label": "Public",
                 "defaultValue": "",
                 "required": false,
-                "displayed": true
+                "displayed": false
             },
             {
                 "name": "photos",
@@ -91,7 +91,7 @@
                 "label": "Photos",
                 "defaultValue": "",
                 "required": false,
-                "displayed": true,
+                "displayed": false,
                 "collection": "photo"
             }
         ],

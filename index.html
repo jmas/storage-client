@@ -14,8 +14,8 @@
     <div id="app">
       <div id="breadcrumbs" ng-controller="BreadcrumbsCtrl">
         <span ng-repeat="item in app.getBreadcrumbs()">
-          <a class="item" href="#{{item.path}}" ng-if="item.path">{{item.name}}</a>
-          <span class="item" ng-if="!item.path">{{item}}</span>
+          <a class="item" href="#{{item.path}}" ng-if="item.path">{{ item.name | translate}}</a>
+          <span class="item" ng-if="!item.path">{{ item | translate }}</span>
         </span>
       </div>
 
@@ -34,6 +34,8 @@
   <script src="bower_components/momentjs/min/moment.min.js"></script>
   <script src="bower_components/angular/angular.min.js"></script>
   <script src="bower_components/angular-route/angular-route.min.js"></script>
+  <script src="bower_components/angular-translate/angular-translate.min.js"></script>
+  <script src="bower_components/angular-translate-loader-static-files/angular-translate-loader-static-files.min.js"></script>
   <script src="bower_components/textAngular/src/textAngular-sanitize.js"></script>
   <script src="bower_components/textAngular/src/textAngular.js"></script>
   <script src="bower_components/textAngular/src/textAngularSetup.js"></script>

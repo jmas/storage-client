@@ -4,14 +4,14 @@
       <entry-field ng-repeat="field in editing.fields" field="field" entry="editing.entry"></entry-field>
 
       <div class="buttons-right">
-        <button class="btn primary" ng-click="save()">{{editingItems.length > 1 ? 'Save and Back': 'Save'}}</button>
+        <button class="btn primary" ng-click="save()">{{editingItems.length > 1 ? 'Save and Back': 'Save' | translate}}</button>
       </div>
       <div class="buttons-left">
-        <button class="btn simple" ng-click="cancel()">{{editingItems.length > 1 ? 'Back': 'Cancel'}}</button>
+        <button class="btn simple" ng-click="cancel()">{{editingItems.length > 1 ? 'Back': 'Cancel' | translate}}</button>
       </div>
 
       <div class="entry-date">
-        Created {{humanizeDate(record.createdAt)}} (updated {{humanizeDate(record.updatedAt)}})
+        {{ 'Created' | translate }} {{humanizeDate(record.createdAt)}} ({{ 'Updated' | translate }} {{humanizeDate(record.updatedAt)}})
       </div>
     </div>
   </modal-dialog>

@@ -3,11 +3,11 @@
     <div class="field-item" ng-repeat="field in fields" ng-if="field.displayed">
       <span class="field-label" ng-class="{required: field.required}"><acronym title="{{field.name}}">{{field.label || field.name}}</acronym></span>
       <span class="field-value" ng-if="! field.collection">{{record[field.name]}}</span>
-      <span class="field-value" ng-if="field.collection && record[field.name] && record[field.name] != 0"><a ng-click="viewEntries(field, record)">View ({{field.type == 'collectionOne' ? 1: record[field.name].length}})</a></span>
+      <span class="field-value" ng-if="field.collection && record[field.name] && record[field.name] != 0"><a ng-click="viewEntries(field, record)">{{ 'View' | translate }} ({{field.type == 'collectionOne' ? 1: record[field.name].length}})</a></span>
       <span class="field-value" ng-if="field.collection && (! record[field.name] || record[field.name] == 0)"></span>
     </div>
     <div class="entry-date">
-      Created {{humanizeDate(record.createdAt)}} (updated {{humanizeDate(record.updatedAt)}})
+      {{ 'Created' | translate }} {{humanizeDate(record.createdAt)}} ({{ 'Updated' | translate }} {{humanizeDate(record.updatedAt)}})
     </div>
   </div>
   <div ng-transclude></div>

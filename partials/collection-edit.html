@@ -1,7 +1,7 @@
 <div id="collection-setup">
   <div class="collection-name">
-    <input type="text" class="collection-name-input" ng-model="collection.name" placeholder="Collection name" ng-change="updateLabel()" />
-    <input type="text" class="collection-label-input" ng-model="collection.label" placeholder="Label" />
+    <input type="text" class="collection-name-input" ng-model="collection.name" placeholder="{{ 'Collection name' | translate }}" ng-change="updateLabel()" />
+    <input type="text" class="collection-label-input" ng-model="collection.label" placeholder="{{ 'Label' | translate }}" />
   </div>
 
   <div id="sidebar">
@@ -15,15 +15,15 @@
 
     <div id="fields-sortby">
       <select ng-model="collection.sort" ng-init="collection.sort=(collection.sort ? collection.sort: null)">
-        <option value="null">- Sort By -</option>
+        <option value="null">- {{ 'Sort By' | translate }} -</option>
         <option value="{{field.name}}" ng-repeat="field in collection.fields" ng-selected="collection.sort == field.name">{{field.name}}</option>
         <option value="createdAt">createdAt</option>
         <option value="updatedAt">updatedAt</option>
       </select>
 
       <select ng-model="collection.sortType" ng-init="collection.sortType=(collection.sortType ? collection.sortType: '-1')">
-        <option value="1">ascending</option>
-        <option value="-1">descending</option>
+        <option value="1">{{ 'ascending' | translate }}</option>
+        <option value="-1">{{ 'descending' | translate }}</option>
       </select>
     </div>
   </div>
@@ -33,7 +33,7 @@
     <div id="collection-field-list" class="collection-field-list" ng-repeat="item in collection.fields">
       <div class="item">
         <div class="name">
-          <input type="text" ng-model="item.name" ng-change="setCollectionChange()" placeholder="Field name" />
+          <input type="text" ng-model="item.name" ng-change="setCollectionChange()" placeholder="{{ 'Field name' | translate }}" />
         </div>
         <div class="options">
           <a ng-click="toggleField($index)"><img src="images/setup.png" /></a>
@@ -44,37 +44,37 @@
             <div class="field-setup-options">
               <div class="field-setup-option">
                 <select ng-model="item.type">
-                  <option value="text">Text</option>
-                  <option value="password">Password</option>
-                  <option value="boolean">Boolean</option>
-                  <option value="select">Select</option>
-                  <option value="wysiwyg">Wysiwyg</option>
-                  <option value="multiline">Multiline</option>
-                  <option value="datetime">Date Time</option>
-                  <option value="number">Number</option>
-                  <option value="float">Float Number</option>
-                  <option value="media">Media</option>
-                  <option value="collectionOne">Collection entry</option>
-                  <option value="collectionMany">Collection entries</option>
+                  <option value="text">{{ 'Text' | translate }}</option>
+                  <option value="password">{{ 'Password' | translate }}</option>
+                  <option value="boolean">{{ 'Boolean' | translate }}</option>
+                  <option value="select">{{ 'Select' | translate }}</option>
+                  <option value="wysiwyg">{{ 'Wysiwyg' | translate }}</option>
+                  <option value="multiline">{{ 'Multiline' | translate }}</option>
+                  <option value="datetime">{{ 'Date Time' | translate }}</option>
+                  <option value="number">{{ 'Number' | translate }}</option>
+                  <option value="float">{{ 'Float Number' | translate }}</option>
+                  <option value="media">{{ 'Media' | translate }}</option>
+                  <option value="collectionOne">{{ 'Collection entry' | translate }}</option>
+                  <option value="collectionMany">{{ 'Collection entries' | translate }}</option>
                 </select>
               </div>
               <div class="field-setup-option">
-                <input type="text" placeholder="Label" ng-model="item.label" />
+                <input type="text" placeholder="{{ 'Label' | translate }}" ng-model="item.label" />
               </div>
               <div class="field-setup-option">
-                <input type="text" placeholder="Default value" ng-model="item.defaultValue" />
+                <input type="text" placeholder="{{ 'Default value' | translate }}" ng-model="item.defaultValue" />
               </div>
             </div>
             <div class="field-options-title">
-              Extra Options
+              {{ 'Extra Options' | translate }}
             </div>
             <div class="field-options">
               <div class="field-option">
-                <label>Required</label>
+                <label>{{ 'Required' | translate }}</label>
                 <span class="field"><input type="checkbox" ng-model="item.required" /></span>
               </div>
               <div class="field-option" ng-if="item.type=='collectionOne' || item.type=='collectionMany'">
-                <label>Collection</label>
+                <label>{{ 'Collection' | translate }}</label>
                 <span class="field">
                   <select ng-model="item.collection">
                     <option value="{{collectionItem.name}}" ng-repeat="collectionItem in collections" ng-selected="item.collection == collectionItem.name">{{collectionItem.label || collectionItem.name}}</option>
@@ -88,12 +88,12 @@
     </div>
 
     <div class="collection-setup-options">
-      <a ng-click="addField(collectionId)" class="btn trusty" title="Add Field"><img src="images/plus-white.png" /></a>
+      <a ng-click="addField(collectionId)" class="btn trusty" title="{{ 'Add Field' | translate }}"><img src="images/plus-white.png" /></a>
     </div>
 
     <div class="collection-setup-buttons">
-      <a class="btn primary" ng-click="save()">Save</a>
-      <a class="btn" ng-click="saveAndClose()">Save and Close</a>
+      <a class="btn primary" ng-click="save()">{{ 'Save' | translate }}</a>
+      <a class="btn" ng-click="saveAndClose()">{{ 'Save and Back' | translate }}</a>
     </div>
 
   </div>

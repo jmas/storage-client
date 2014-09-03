@@ -1,6 +1,6 @@
 <div id="collections">
   <div class="collections-options">
-    <a href="#collections/create" class="btn trusty" title="Create"><img src="images/plus-white.png" /></a>
+    <a href="#collections/create" class="btn trusty" title="{{ 'Create' | translate }}"><img src="images/plus-white.png" /></a>
   </div>
   <div class="collection-list">
     <div class="item" ng-repeat-reorder="item in collections" ng-repeat-reorder-handle ng-if="item.name">
@@ -9,8 +9,8 @@
         <span class="real-name" ng-if="item.label">{{item.name}}</span>
       </div>
       <div class="options">
-        <a href="#collections/{{item.name}}/edit"><img src="images/setup.png" /></a>
-        <a ng-click="removeCollection(item.name)"><img src="images/remove.png" /></a>
+        <a href="#collections/{{item.name}}/edit" title="{{ 'Setup' | translate }}"><img src="images/setup.png" /></a>
+        <a ng-click="removeCollection(item.name)" title="{{ 'Remove' | translate }}"><img src="images/remove.png" /></a>
       </div>
     </div>
   </div>
