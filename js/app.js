@@ -531,16 +531,11 @@ app.factory('EntriesService', function($http) {
       collection.fields.push(data);
     },
 
-    removeCollectionField: function(collectionName, fieldName)
+    removeCollectionField: function(collectionName, fieldIndex)
     {
       var collection = this.getCollection(collectionName);
 
-      for (var i=0, len=collection.fields.length; i<len; i++) {
-        if (collection.fields[i].name == fieldName) {
-          collection.fields.splice(i, 1);
-          break;
-        }
-      }
+      collection.fields.splice(fieldIndex, 1);
     }
   };
 });
