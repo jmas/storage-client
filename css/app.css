@@ -10,6 +10,12 @@ body {
   color: #2E2E2E;
 }
 
+img {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
 .hiden {
   display: none;
 }
@@ -61,6 +67,12 @@ a:hover {
   -ms-user-select: none;
   user-select: none;
   cursor: pointer;
+}
+
+.btn img {
+  vertical-align: middle;
+  display: inline-block;
+  margin-top: -2px;
 }
 
 .btn.small {
@@ -226,7 +238,7 @@ textarea:focus {
 
 .collection-list .item {
   position: relative;
-  border: 1px solid #eee;
+  border: 1px solid #ddd;
   background-color: #fff;
   padding: 15px;
   border-radius: 3px;
@@ -312,7 +324,7 @@ textarea:focus {
 
 .collection-field-list .item {
   position: relative;
-  border: 1px solid #eee;
+  border: 1px solid #ddd;
   background-color: #fff;
   border-radius: 3px;
   margin-bottom: 15px;
@@ -471,7 +483,7 @@ textarea:focus {
 .entry-list .item,
 .entry {
   position:relative;
-  border: 1px solid #eee;
+  border: 1px solid #ddd;
   background-color: #fff;
   margin-top: -1px;
   padding: 10px 15px;
@@ -498,12 +510,14 @@ textarea:focus {
 
 .entry-list .item:last-child,
 .entries entry:last-child .entry {
-  border-radius: 0 0 3px 3px;
+  border-bottom-left-radius:3px;
+  border-bottom-right-radius:3px;
 }
 
 .entry-list .item:first-child,
 .entries entry:first-child .entry {
-  border-radius: 3px 3px 0 0;
+  border-top-left-radius:3px;
+  border-top-right-radius:3px;
 }
 
 .entry-list .item.active,
@@ -895,7 +909,22 @@ textarea:focus {
   padding: 0;
 }
 
+.ta-scroll-window .popover {
+  position: absolute;
+  display: none;
+}
+
+.ta-scroll-window .popover.in {
+  display: block;
+}
+
 .ta-scroll-window .ng-isolate-scope p {
+  margin: .7em 0;
+}
+
+.ta-scroll-window .ng-isolate-scope blockquote {
+  padding: 1px .5em;
+  border-left: 2px solid #eee;
   margin-bottom: .7em;
 }
 

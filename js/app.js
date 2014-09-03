@@ -923,10 +923,17 @@ app.controller('EntryBrowserDialogCtrl', function($scope, $rootScope, EntriesSer
     var fields = EntriesService.getCollectionFields(field.collection);
 
     $scope.collectionName = field.collection;
-    $scope.collection = {
-      fields: fields,
-      entries: (field.type == 'collectionOne' ? [entry[field.name]]: entry[field.name])
-    };
+
+    if ((field.type == 'collectionOne' && typeof entry[field.name] == 'object')
+      || (field.type == 'collectionMany' && entry[field.name] instanceof Array))  {
+      $scope.collection = {
+        fields: fields,
+        entries: (field.type == 'collectionOne' ? [entry[field.name]]: entry[field.name])
+      };
+    } else {
+      // load entries by ids
+      // EntriesService.loadEntries($scope.collectionName);
+    }
 
     $scope.active = true;
     $scope.entry = entry[field.name];
