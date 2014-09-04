@@ -217,6 +217,12 @@ app.factory("AppService", function($translate, $rootScope) {
 
     setBreadcrumbs: function(breadcrumbs) {
       this.breadcrumbs = breadcrumbs;
+      
+      if (this.breadcrumbs.length > 0) {
+        $rootScope.title = this.breadcrumbs[this.breadcrumbs.length - 1];
+      } else {
+        $rootScope.title = '';
+      }
     },
 
     getBreadcrumbs: function() {
