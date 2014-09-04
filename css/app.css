@@ -164,6 +164,50 @@ textarea:focus {
   font-weight: normal;
 }
 
+#messages {
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  width: 300px;
+  margin-left: -150px;
+}
+
+#messages .message {
+  position: relative;
+  background-color: rgba(0, 0, 0, .5);
+  padding: 10px 15px;
+  border-radius: 3px;
+  color: #fff;
+  margin-bottom: 15px;
+}
+
+#messages .message.message-success {
+  background-color: #86B404;
+}
+
+#messages .message.message-error {
+  background-color: #FE642E;
+}
+
+#messages .close {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 5px;
+  margin: auto;
+  display: block;
+  line-height: 30px;
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  color: #fff;
+  font-size: 1.5em;
+}
+
+#messages .text {
+  padding-right: 35px;
+}
+
 #sidebar {
   position: relative;
   /* display: none; */

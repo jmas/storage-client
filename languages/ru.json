@@ -46,5 +46,9 @@
   "View": "Просмотреть",
   "View All": "Просмотреть все",
   "Created": "Создано",
-  "Updated": "Обновлено"
+  "Updated": "Обновлено",
+  "Saved successfully": "Cохранено успешно",
+  "Removed successfully": "Удалено успешно",
+  "Not removed": "Не удалено",
+  "Not saved": "Не сохранено"
 }

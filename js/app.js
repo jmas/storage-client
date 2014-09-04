@@ -5,11 +5,9 @@ var baseUrl = 'api.php';
 var app = a.module('app', [
   'ngRoute',
   'textAngular',
-  'flash',
   'ngRepeatReorder',
   'angular-loading-bar',
   'debounce',
-  'cfp.hotkeys',
   'pascalprecht.translate'
 ]);
 
@@ -181,22 +179,53 @@ app.directive('shortList', function() {
 });
 
 
-app.factory("AppService", function() {
-  var app = {
-    breadcrumbs: []
-  };
-
+app.factory("AppService", function($translate, $rootScope) {
   return {
-    setBreadcrumbs: function(breadcrumbs)
-    {
-      app.breadcrumbs = breadcrumbs;
+    breadcrumbs: [],
+
+    setBreadcrumbs: function(breadcrumbs) {
+      this.breadcrumbs = breadcrumbs;
     },
 
-    getBreadcrumbs: function()
-    {
-      return app.breadcrumbs;
+    getBreadcrumbs: function() {
+      return this.breadcrumbs;
+    },
+
+    showMessage: function(type, msg) {
+      $rootScope.$emit('message', type, msg);
     }
   };
+});
+
+
+app.controller('MessagesCtrl', function($scope, $rootScope) {
+  $scope.messages = [];
+
+  $scope.remove = function(id) {
+    for (var i=0,len=$scope.messages.length; i<len; i++) {
+      if ($scope.messages[i] && $scope.messages[i].id == id) {
+        $scope.messages.splice(i, 1);
+      }
+    }
+  };
+
+  $rootScope.$on('message', function(event, type, message) {
+    var id = Math.random() + type + message;
+
+    $scope.messages.unshift({
+      id: id,
+      type: type,
+      text: message
+    });
+
+    setTimeout((function(id) {
+      return function() {
+        $scope.$apply(function() {
+          $scope.remove(id);
+        });        
+      };
+    })(id), 5000);
+  });
 });
 
 
@@ -566,7 +595,7 @@ app.controller('CollectionsCtrl', function($scope, AppService, EntriesService) {
 });
 
 
-app.controller('CollectionEditCtrl', function($scope, $routeParams, $location, AppService, EntriesService, flash) {
+app.controller('CollectionEditCtrl', function($scope, $routeParams, $location, AppService, EntriesService) {
   $scope.collectionName = $routeParams.collectionName || null;
   $scope.collection = EntriesService.getCollection($scope.collectionName);
   $scope.collections = EntriesService.getCollections();
@@ -634,8 +663,11 @@ app.controller('CollectionEditCtrl', function($scope, $routeParams, $location, A
 
   $scope.save = function(redirect) {
     return EntriesService.saveCollection($scope.collection.name)
+      .error(function() {
+        AppService.showMessage('error', 'Not saved');
+      })
       .then(function() {
-        flash('success', 'Saved successfully');
+        AppService.showMessage('success', 'Saved successfully');
 
         if ($scope.collectionName === null && redirect !== false) {
           $location.path('collections/' + $scope.collection.name + '/edit');
@@ -656,7 +688,7 @@ app.controller('CollectionEditCtrl', function($scope, $routeParams, $location, A
 });
 
 
-app.controller('EntriesCtrl', function($scope, $rootScope, $routeParams, AppService, EntriesService, flash) {
+app.controller('EntriesCtrl', function($scope, $rootScope, $routeParams, AppService, EntriesService) {
   $scope.collectionName = $routeParams.collectionName;
 
   $scope.collection = {};
@@ -695,8 +727,11 @@ app.controller('EntriesCtrl', function($scope, $rootScope, $routeParams, AppServ
 
   $scope.removeEntry = function(entryId) {
     EntriesService.removeEntries($scope.collectionName, [entryId])
+      .error(function() {
+        AppService.showMessage('error', 'Not removed');
+      })
       .then(function() {
-        flash('success', 'Removed successfully');
+        AppService.showMessage('success', 'Removed successfully');
       });
   };
 
@@ -755,8 +790,11 @@ app.controller('EntriesCtrl', function($scope, $rootScope, $routeParams, AppServ
     }
 
     EntriesService.removeEntries($scope.collectionName, ids)
+      .error(function() {
+        AppService.showMessage('error', 'Not removed');
+      })
       .then(function() {
-        flash('success', 'Removed successfully');
+        AppService.showMessage('success', 'Removed successfully');
       });
   };
 
@@ -767,13 +805,16 @@ app.controller('EntriesCtrl', function($scope, $rootScope, $routeParams, AppServ
 });
 
 
-app.controller('EntryEditDialogCtrl', function($scope, $rootScope, EntriesService, flash) {
+app.controller('EntryEditDialogCtrl', function($scope, $rootScope, AppService, EntriesService) {
   $scope.active = false;
   $scope.editingItems = [];
   $scope.editing = {};
 
   $scope.save = function() {
     EntriesService.saveEntry($scope.editing.collectionName, $scope.editing.entry)
+      .error(function() {
+        AppService.showMessage('error', 'Not saved');
+      })
       .then(function(response) {
         if ($scope.editing.targetEntry && $scope.editing.targetField) {
           if ($scope.editing.targetField.type == 'collectionOne') {
@@ -795,7 +836,7 @@ app.controller('EntryEditDialogCtrl', function($scope, $rootScope, EntriesServic
           $scope.active = false;
         }
 
-        flash('Saved successfully');
+        AppService.showMessage('success', 'Saved successfully');
       });
   };
 
