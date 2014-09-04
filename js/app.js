@@ -287,6 +287,16 @@ app.factory('EntriesService', function($http) {
       return null;
     },
 
+    getEntries: function(collectionName) {
+      var collection = this.getCollection(collectionName);
+
+      if (! collection || typeof collection.entries == 'undefined') {
+        collection.entries = [];
+      }
+
+      return collection.entries;
+    },
+
     setEntry: function(collectionName, entry)
     {
       var collection = this.getCollection(collectionName);
@@ -685,6 +695,66 @@ app.controller('EntriesCtrl', function($scope, $rootScope, $routeParams, AppServ
 
   $scope.removeEntry = function(entryId) {
     EntriesService.removeEntries($scope.collectionName, [entryId])
+      .then(function() {
+        flash('success', 'Removed successfully');
+      });
+  };
+
+  $scope.deselectAll = function() {
+    var entries = EntriesService.getEntries($scope.collectionName);
+
+    for (var i=0,len=entries.length; i<len; i++) {
+      entries[i]._active = false;
+    }
+  };
+
+  $scope.selectAll = function() {
+    var entries = EntriesService.getEntries($scope.collectionName);
+
+    for (var i=0,len=entries.length; i<len; i++) {
+      entries[i]._active = true;
+    }
+  };
+
+  $scope.isAllSelected = function() {
+    var entries = EntriesService.getEntries($scope.collectionName);
+
+    for (var i=0,len=entries.length; i<len; i++) {
+      if (typeof entries[i]._active === 'undefined' || entries[i]._active !== true) {
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  $scope.isSelected = function() {
+    var entries = EntriesService.getEntries($scope.collectionName);
+
+    for (var i=0,len=entries.length; i<len; i++) {
+      if (typeof entries[i]._active !== 'undefined' && entries[i]._active === true) {
+        return true;
+      }
+    }
+
+    return false;
+  };
+
+  $scope.onActive = function(entry, isActive) {
+    entry._active = isActive;
+  };
+
+  $scope.removeSelected = function() {
+    var entries = EntriesService.getEntries($scope.collectionName);
+    var ids = [];
+
+    for (var i=0,len=entries.length; i<len; i++) {
+      if (typeof entries[i]._active !== 'undefined' && entries[i]._active === true) {
+        ids.push(entries[i].id);
+      }
+    }
+
+    EntriesService.removeEntries($scope.collectionName, ids)
       .then(function() {
         flash('success', 'Removed successfully');
       });
