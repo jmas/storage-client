@@ -165,7 +165,7 @@ textarea:focus {
 }
 
 #messages {
-  position: absolute;
+  position: fixed;
   top: 15px;
   left: 50%;
   width: 300px;
