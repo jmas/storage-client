@@ -35,6 +35,7 @@ $app->add(new \Slim\Extras\Middleware\HttpBasicAuth(function($username, $passwor
 
 // set json http header
 $app->response->headers->set('Content-Type', 'application/json');
+$app->response->headers->set('Access-Control-Allow-Origin', '*');
 
 // get all collections
 $app->get('/collections', function() use ($app) {

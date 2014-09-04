@@ -182,11 +182,11 @@ textarea:focus {
 }
 
 #messages .message.message-success {
-  background-color: #86B404;
+  background-color: rgba(134, 180, 4, .8);
 }
 
 #messages .message.message-error {
-  background-color: #FE642E;
+  background-color: rgba(254, 100, 46, .8);
 }
 
 #messages .close {
@@ -1059,4 +1059,24 @@ textarea:focus {
   .entry-list-options {
     padding: 0 15px;
   }
+}
+
+.start-form {
+  background-color: #fff;
+  max-width: 300px;
+  padding: 30px;
+  border-radius: 3px;
+}
+
+.start-form label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.start-form .field {
+  margin-bottom: 30px;
+}
+
+.start-form input[type="text"] {
+  width: 95%;
 }

@@ -1,2 +1,4 @@
 config.local.php
 *.zip
+build/*
+data/*

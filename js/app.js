@@ -1,6 +1,6 @@
 (function(a) {
 
-var baseUrl = 'api.php';
+var apiUrl = localStorage.apiUrl;
 
 var app = a.module('app', [
   'ngRoute',
@@ -10,6 +10,7 @@ var app = a.module('app', [
   'debounce',
   'pascalprecht.translate'
 ]);
+
 
 app.config(function($routeProvider, $locationProvider, $translateProvider, cfpLoadingBarProvider) {
   cfpLoadingBarProvider.includeSpinner = false;
@@ -41,6 +42,10 @@ app.config(function($routeProvider, $locationProvider, $translateProvider, cfpLo
       templateUrl: 'partials/entries.html',
       controller: 'EntriesCtrl'
     })
+    .when('/start', {
+      templateUrl: 'partials/start.html',
+      controller: 'StartCtrl'
+    })
     .otherwise({
       redirectTo: '/collections'
     });
@@ -51,10 +56,16 @@ app.config(function($routeProvider, $locationProvider, $translateProvider, cfpLo
     });
 });
 
-app.run(function($translate, EntriesService) {
-  EntriesService.loadCollections();
-  $translate.use('ru');
+
+app.run(function($translate, $location, EntriesService) {
+  if (! localStorage.language || ! localStorage.apiUrl) {
+    $location.path('start');
+  } else {
+    EntriesService.loadCollections();
+    $translate.use(localStorage.language);
+  }
 });
+
 
 app.directive('entry', function() {
   return {
@@ -84,6 +95,7 @@ app.directive('entry', function() {
   };
 });
 
+
 app.directive('entryField', function() {
   return {
     restrict: 'E',
@@ -108,6 +120,7 @@ app.directive('entryField', function() {
   };
 });
 
+
 app.directive('field', function() {
   return {
     restrict: 'E',
@@ -120,6 +133,7 @@ app.directive('field', function() {
     templateUrl: 'partials/field.html'
   };
 });
+
 
 app.directive('modalDialog', function() {
   return {
@@ -136,6 +150,7 @@ app.directive('modalDialog', function() {
     }
   };
 });
+
 
 app.directive('shortList', function() {
   return {
@@ -229,6 +244,27 @@ app.controller('MessagesCtrl', function($scope, $rootScope) {
 });
 
 
+app.controller('StartCtrl', function($scope, $translate, AppService) {
+  $scope.apiUrl = localStorage.apiUrl;
+  $scope.languages = window.languages.slice(0);
+  $scope.language = localStorage.language || 'default';
+
+  $scope.$watch('language', function() {
+    $translate.use($scope.language);
+  });
+
+  $scope.save = function() {
+    localStorage.language = $scope.language || 'default';
+    localStorage.apiUrl = $scope.apiUrl || '';
+
+    var url = window.location.href;
+    window.location.replace(url.substring(0, url.indexOf('#') + 1));
+  };
+
+  AppService.setBreadcrumbs(['Start']);
+});
+
+
 app.controller('BreadcrumbsCtrl', function($scope, AppService) {
   $scope.app = AppService;
 });
@@ -256,7 +292,7 @@ app.factory('EntriesService', function($http) {
         return $http({
           method: 'GET',
           params: params,
-          url: baseUrl + '/collections/' + collection.name + '/entries'
+          url: apiUrl + '/collections/' + collection.name + '/entries'
         }).success(function(response) {
           if (response.result) {
             me.setEntries(collectionName, response.result);
@@ -265,7 +301,7 @@ app.factory('EntriesService', function($http) {
       } else {
         return $http({
           method: 'GET',
-          url: baseUrl + '/collections'
+          url: apiUrl + '/collections'
         })
           .success(function(response) {
             if (typeof response.result !== 'undefined' && response.result.length > 0) {
@@ -366,7 +402,7 @@ app.factory('EntriesService', function($http) {
       return $http({
         method: 'DELETE',
         data: entriesIds,
-        url: baseUrl + '/collections/' + collectionName + '/entries'
+        url: apiUrl + '/collections/' + collectionName + '/entries'
       })
         .success(function(response) {
           if (typeof response.error === 'undefined') {
@@ -397,7 +433,7 @@ app.factory('EntriesService', function($http) {
       return $http({
         method: 'POST',
         data: entry,
-        url: baseUrl + '/collections/' + collection.name + '/entries'
+        url: apiUrl + '/collections/' + collection.name + '/entries'
       })
         .success(function(response) {
           if (typeof response.error === 'undefined') {
@@ -412,7 +448,7 @@ app.factory('EntriesService', function($http) {
 
       return $http({
         method: 'GET',
-        url: baseUrl + '/collections'
+        url: apiUrl + '/collections'
       })
         .success(function(response) {
           if (typeof response.result !== 'undefined') {
@@ -470,7 +506,7 @@ app.factory('EntriesService', function($http) {
 
       return $http({
         method: 'DELETE',
-        url: baseUrl + '/collections/' + collectionName
+        url: apiUrl + '/collections/' + collectionName
       })
         .success(function(response) {
           if (typeof response.error == 'undefined') {
@@ -512,7 +548,7 @@ app.factory('EntriesService', function($http) {
       return $http({
         method: 'POST',
         data: data,
-        url: baseUrl + '/collections/' + name
+        url: apiUrl + '/collections/' + name
       })
         .success(function(response) {
           if (typeof response.result !== 'undefined') {
@@ -532,7 +568,7 @@ app.factory('EntriesService', function($http) {
       return $http({
         method: 'POST',
         data: collections,
-        url: baseUrl + '/collections'
+        url: apiUrl + '/collections'
       });
     },
 

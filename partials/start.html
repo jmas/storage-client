@@ -1,0 +1,15 @@
+<div class="start-form">
+  <label>{{ 'Language' | translate }}</label>
+  <div class="field">
+    <select ng-model="language">
+      <option ng-repeat="name in languages">{{ name }}</option>
+    </select>
+  </div>
+
+  <label>{{ 'API URL' | translate }}</label>
+  <div class="field">
+    <input type="text" ng-model="apiUrl" />
+  </div>
+
+  <button class="btn primary" ng-click="save()">{{ 'Continue' | translate }}</button>
+</div>

@@ -50,5 +50,9 @@
   "Saved successfully": "Cохранено успешно",
   "Removed successfully": "Удалено успешно",
   "Not removed": "Не удалено",
-  "Not saved": "Не сохранено"
+  "Not saved": "Не сохранено",
+  "Continue": "Продолжить",
+  "Start": "Начало",
+  "Language": "Язык",
+  "API URL": "URL-адрес API"
 }
