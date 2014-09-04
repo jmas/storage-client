@@ -870,8 +870,6 @@ app.controller('EntryBrowserDialogCtrl', function($scope, $rootScope, EntriesSer
   };
 
   var refreshEntries = function() {
-    $scope.skip = 0;
-
     if (! $scope.collectionName || $scope.isView) {
       return;
     }
@@ -912,7 +910,10 @@ app.controller('EntryBrowserDialogCtrl', function($scope, $rootScope, EntriesSer
     }
   };
 
-  $scope.$watch('params.filter', refreshEntries);
+  $scope.$watch('params.filter', function() {
+    $scope.params.skip = 0;
+    refreshEntries();
+  });
 
   $scope.clear = function() {
     $scope.collectionName = null;
@@ -920,6 +921,7 @@ app.controller('EntryBrowserDialogCtrl', function($scope, $rootScope, EntriesSer
     $scope.entry = null;
     $scope.field = null;
     $scope.params.filter = '';
+    $scope.params.skip = 0;
     $scope.isView = false;
   };
 

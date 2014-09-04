@@ -1,5 +1,5 @@
 <div class="entry-list-options">
-  <a ng-click="createEntry()" class="btn trusty" title="Create"><img src="images/plus-white.png" /></a>
+  <a ng-click="createEntry()" class="btn trusty" title="{{ 'Create' | translate }}"><img src="images/plus-white.png" /></a>
   <a class="btn select-all-btn" ng-click="selectAll()" ng-class="{active: !isAllSelected()}" ng-if="collection.entries.length > 0" title="{{ 'Select All' | translate }}"><img src="images/selected-white.png" /></a>
   <a class="btn deselect-all-btn" ng-click="deselectAll()" ng-class="{active: isSelected()}">{{ 'Deselect' | translate }}</a>
   <a class="btn danger remove-btn" ng-click="removeSelected()" ng-class="{active: isSelected()}">{{ 'Remove Selected' | translate }}</a>
