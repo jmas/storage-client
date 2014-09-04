@@ -12,8 +12,8 @@
 <div class="entries">
   <entry ng-repeat="record in collection.entries" fields="collection.fields" record="record" ng-if="record.id" ng-class="{active: record._active}" on-active="onActive">
     <div class="options">
-      <a ng-click="editEntry(record.id)" title="{{ 'Edit' | translate }}"><img src="images/edit.png" /></a>
-      <a ng-click="removeEntry(record.id)" title="{{ 'Remove' | translate }}"><img src="images/remove.png" /></a>
+      <a ng-click="editEntry(record.id)" eat-click title="{{ 'Edit' | translate }}"><img src="images/edit.png" /></a>
+      <a ng-click="removeEntry(record.id)" eat-click title="{{ 'Remove' | translate }}"><img src="images/remove.png" /></a>
     </div>
   </entry>
 </div>

@@ -54,5 +54,6 @@
   "Continue": "Продолжить",
   "Start": "Начало",
   "Language": "Язык",
-  "API URL": "URL-адрес API"
+  "API URL": "URL-адрес API",
+  "You need to set valid API URL": "Вам нужно указать верный URL-адрес API"
 }

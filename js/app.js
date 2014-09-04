@@ -72,11 +72,15 @@ app.run(function($translate, $location, EntriesService) {
 
 
 app.directive('eatClick', function() {
-    return function(scope, element, attrs) {
-        $(element).click(function(event) {
-            event.preventDefault();
-        });
+  return {
+    restrict: 'A',
+    link: function(scope, element, attrs) {
+      element[0].onclick = function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+      };
     }
+  }
 });
 
 
@@ -274,8 +278,7 @@ app.controller('StartCtrl', function($scope, $translate, $location, AppService, 
     
     EntriesService.loadCollections()
       .error(function() {
-        alert('You need to set valid API URL.');
-        //$location.path('start');
+        AppService.showMessage('error', 'You need to set valid API URL');
       })
       .success(function() {
         $location.path('collections');
