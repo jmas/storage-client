@@ -12,10 +12,12 @@ var app = a.module('app', [
 ]);
 
 
-app.config(function($routeProvider, $locationProvider, $translateProvider, cfpLoadingBarProvider) {
+app.config(function($routeProvider, $httpProvider, $locationProvider, $translateProvider, cfpLoadingBarProvider) {
   cfpLoadingBarProvider.includeSpinner = false;
 
   $locationProvider.html5Mode(false);
+
+  $httpProvider.responseInterceptors.push('appHttpResponseInterceptor');
 
   $routeProvider
     .when('/collections', {
@@ -68,6 +70,31 @@ app.run(function($translate, $location, EntriesService) {
 
     $translate.use(localStorage.language);
   }
+});
+
+
+app.factory('appHttpResponseInterceptor', function($q, $rootScope) {
+  $rootScope.closeError = function() {
+    $rootScope.error = null;
+  };
+
+  return function(promise) {
+    return promise.then(
+      function success(response) {
+        return response;
+      },
+      function error(response) {
+        if (response.status === 401 || response.status === 500) {
+          $rootScope.error = {
+            status: response.status + ' ' + (typeof response.data.status !== 'undefined' ? response.data.status: response.statusText),
+            message: (typeof response.data.error !== 'undefined' ? response.data.error: response.data)
+          };
+        }
+
+        return $q.reject(response);
+      }
+    );
+  };
 });
 
 
@@ -217,7 +244,7 @@ app.factory("AppService", function($translate, $rootScope) {
 
     setBreadcrumbs: function(breadcrumbs) {
       this.breadcrumbs = breadcrumbs;
-      
+
       if (this.breadcrumbs.length > 0) {
         $rootScope.title = this.breadcrumbs[this.breadcrumbs.length - 1];
       } else {
@@ -1095,7 +1122,7 @@ app.controller('EntryBrowserDialogCtrl', function($scope, $rootScope, EntriesSer
     $scope.field = field;
     $scope.params.filter = '';
     $scope.isView = false;
-    $scope.title = 'Select Entry';
+    $scope.title = (field.type == 'collectionOne' ? 'Select Entry': 'Select Entries');
 
     refreshEntries();
   });
@@ -1121,7 +1148,7 @@ app.controller('EntryBrowserDialogCtrl', function($scope, $rootScope, EntriesSer
     $scope.field = field;
     $scope.params.filter = '';
     $scope.isView = true;
-    $scope.title = 'View Entries';
+    $scope.title = (field.type == 'collectionOne' ? 'View Entry': 'View Entries');
 
     updateActiveItems();
   });

@@ -41,6 +41,14 @@
       </div>
     </div>
 
+    <div id="error" ng-if="error">
+      <div class="error-inside">
+        <div class="error-title">{{error.status}}</div>
+        <div class="error-text" ng-bind-html="error.message"></div>
+        <a class="error-close" ng-click="closeError()">&times;</a>
+      </div>
+    </div>
+
   </body>
   
   <!-- build:js js/app.min.js -->
