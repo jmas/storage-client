@@ -61,9 +61,22 @@ app.run(function($translate, $location, EntriesService) {
   if (! localStorage.language || ! localStorage.apiUrl) {
     $location.path('start');
   } else {
-    EntriesService.loadCollections();
+    EntriesService.loadCollections()
+      .error(function() {
+        $location.path('start');
+      });
+
     $translate.use(localStorage.language);
   }
+});
+
+
+app.directive('eatClick', function() {
+    return function(scope, element, attrs) {
+        $(element).click(function(event) {
+            event.preventDefault();
+        });
+    }
 });
 
 
@@ -244,7 +257,7 @@ app.controller('MessagesCtrl', function($scope, $rootScope) {
 });
 
 
-app.controller('StartCtrl', function($scope, $translate, AppService) {
+app.controller('StartCtrl', function($scope, $translate, $location, AppService, EntriesService) {
   $scope.apiUrl = localStorage.apiUrl;
   $scope.languages = window.languages.slice(0);
   $scope.language = localStorage.language || 'default';
@@ -257,8 +270,16 @@ app.controller('StartCtrl', function($scope, $translate, AppService) {
     localStorage.language = $scope.language || 'default';
     localStorage.apiUrl = $scope.apiUrl || '';
 
-    var url = window.location.href;
-    window.location.replace(url.substring(0, url.indexOf('#') + 1));
+    apiUrl = $scope.apiUrl;
+    
+    EntriesService.loadCollections()
+      .error(function() {
+        alert('You need to set valid API URL.');
+        //$location.path('start');
+      })
+      .success(function() {
+        $location.path('collections');
+      });
   };
 
   AppService.setBreadcrumbs(['Start']);
